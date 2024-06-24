@@ -1,3 +1,8 @@
+#include "ft_malloc.h"
+#include <stdio.h>
+
+
 int main(){
-    return 1;
+    printf("%ld\n",sysconf(_SC_PAGESIZE));
 }
+

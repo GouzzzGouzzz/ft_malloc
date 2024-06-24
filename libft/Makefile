@@ -6,7 +6,7 @@
 #    By: gouz <gouz@student.42.fr>                  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/10/06 14:02:56 by nmorandi          #+#    #+#              #
-#    Updated: 2024/06/24 13:31:08 by gouz             ###   ########.fr        #
+#    Updated: 2024/06/24 16:32:12 by gouz             ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,13 +16,11 @@ CC=gcc
 OBJ_DIR=obj
 MANDATORY=ft_atoi.c	 	\
 		ft_bzero.c	 	\
-		ft_calloc.c	 	\
 		ft_isalnum.c	\
 		ft_isalpha.c	\
 		ft_isascii.c	\
 		ft_isdigit.c	\
 		ft_isprint.c 	\
-		ft_itoa.c 		\
 		ft_memchr.c 	\
 		ft_memcmp.c 	\
 		ft_memcpy.c 	\
@@ -32,38 +30,19 @@ MANDATORY=ft_atoi.c	 	\
 		ft_putendl_fd.c \
 		ft_putnbr_fd.c 	\
 		ft_putstr_fd.c 	\
-		ft_split.c 		\
 		ft_strchr.c 	\
-		ft_strdup.c 	\
 		ft_striteri.c 	\
-		ft_strjoin.c 	\
 		ft_strlcat.c 	\
 		ft_strlcpy.c 	\
 		ft_strlen.c 	\
-		ft_strmapi.c 	\
 		ft_strncmp.c 	\
 		ft_strnstr.c 	\
 		ft_strrchr.c	\
-		ft_strtrim.c 	\
-		ft_substr.c 	\
 		ft_tolower.c 	\
 		ft_toupper.c 	\
 
-BONUS=ft_lstsize.c		\
-	ft_lstnew.c			\
-	ft_lstmap.c 		\
-	ft_lstlast.c 		\
-	ft_lstiter.c 		\
-	ft_lstdelone.c 		\
-	ft_lstclear.c 		\
-	ft_lstadd_front.c	\
-	ft_lstadd_back.c 	\
 
 OBJ=$(MANDATORY:%.c=$(OBJ_DIR)/%.o)
-
-ifdef DO_BONUS
-	MANDATORY += $(BONUS)
-endif
 
 all: $(NAME)
 
@@ -82,7 +61,4 @@ fclean: clean
 
 re: fclean all
 
-bonus:
-	make DO_BONUS=1;
-
-.PHONY: all clean fclean re bonus
+.PHONY: all clean fclean re

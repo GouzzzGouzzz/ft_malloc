@@ -3,23 +3,30 @@ ifeq ($(HOSTTYPE),)
 endif
 
 NAME=libft_malloc_$(HOSTTYPE).so
-CFLAGS=-Wall -Werror -Wextra
+CFLAGS=#-Wall -Werror -Wextra
 CC=gcc
 SYMLINK_NAME=libft_malloc.so
 OBJ_DIR=obj
 
-MANDATORY= main.c
+MANDATORY= malloc.c\
+	realloc.c\
+	free.c
+
 OBJ=$(MANDATORY:%.c=$(OBJ_DIR)/%.o)
 
-all: $(NAME)
+all: $(SYMLINK_NAME)
 
 $(OBJ_DIR)/%.o: %.c
 	$(CC) -c $(CFLAGS) -o $@ $<
 
+$(SYMLINK_NAME): $(NAME)
+ifeq ($(wildcard $(SYMLINK_NAME)),)
+	ln -s $(NAME) $(SYMLINK_NAME)
+endif
+
 $(NAME): $(OBJ)
 	$(MAKE) -C ./libft/ all
 	$(CC) -shared -o $(NAME) $(OBJ)
-	ln -s $(NAME) $(SYMLINK_NAME)
 
 clean:
 	$(MAKE) -C ./libft/ clean
@@ -27,10 +34,13 @@ clean:
 
 fclean: clean
 	$(MAKE) -C ./libft/ fclean
-	rm -f $(NAME)
-	rm -f $(SYMLINK_NAME)
+	rm -f $(NAME) $(SYMLINK_NAME) main.o main
+
+test: all
+	$(CC) -c main.c -o main.o
+	gcc main.o -o main -L. -lft_malloc
 
 re: fclean all
 
 
-.PHONY: all clean fclean re bonus
+.PHONY: all clean fclean re test
