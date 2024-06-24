@@ -3,7 +3,8 @@ ifeq ($(HOSTTYPE),)
 endif
 
 NAME=libft_malloc_$(HOSTTYPE).so
-CFLAGS=#-Wall -Werror -Wextra
+CFLAGS=-fPIC #-Wall -Werror -Wextra
+LIBFT=-Llibft/ -lft
 CC=gcc
 SYMLINK_NAME=libft_malloc.so
 OBJ_DIR=obj
@@ -17,7 +18,7 @@ OBJ=$(MANDATORY:%.c=$(OBJ_DIR)/%.o)
 all: $(SYMLINK_NAME)
 
 $(OBJ_DIR)/%.o: %.c
-	$(CC) -c $(CFLAGS) -o $@ $<
+	$(CC) -c $(CFLAGS) $(LIBFT) -o $@ $<
 
 $(SYMLINK_NAME): $(NAME)
 ifeq ($(wildcard $(SYMLINK_NAME)),)
@@ -36,9 +37,9 @@ fclean: clean
 	$(MAKE) -C ./libft/ fclean
 	rm -f $(NAME) $(SYMLINK_NAME) main.o main
 
-test: all
-	$(CC) -c main.c -o main.o
-	gcc main.o -o main -L. -lft_malloc
+test: re
+	$(CC) $(CFLAGS) -c main.c -o main.o
+	gcc main.o -o main -L. -lft_malloc $(LIBFT) -Wl,-R.
 
 re: fclean all
 
