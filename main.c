@@ -1,22 +1,19 @@
 #include "ft_malloc.h"
 
+// #include <stdlib.h>
+// #include <stdio.h>
+// # include "./libft/libft.h"
 int main(){
-    memory_pool[0] = 't';
-    printf("%c\n", memory_pool[0]);
-    return 1;
+    char *test = malloc(20);
+    for (int i = 0; i < 20; i++)
+    {
+        test[i] = '1';
+    }
+    if (test == NULL)
+    {
+        printf("CRASHED\n");
+        return 1;
+    }
+    printf("%s\n", test);
+    free(test);
 }
-
-    //char *test = malloc(20);
-    // if (test == NULL)
-    // {
-    //     printf("CRASHED\n");
-    //     return 1;
-    // }
-    // for (int i = 0; i < 20; i++)
-    // {
-    //     test[i] = 'i';
-    // }
-    //     for (int i = 0; i < 20; i++)
-    // {
-    //     printf("test :%c, = %d\n", test[0], i);
-    // }

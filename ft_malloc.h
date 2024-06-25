@@ -3,20 +3,20 @@
 # include <sys/mman.h>
 # include <sys/resource.h>
 # include "./libft/libft.h"
-
 # include <stdio.h>
+# include <stdbool.h>
 
-
-# define TINY 64
-# define SMALL 256
+//REVOIR LES VALEURS PLUS TARD (need +1 pour la size des chunks + moins grandre valeur ?)
+# define SMALL_VALUE 64
+# define MEDIUM_VALUE 256
 //MAYBE -1 sur les valeurs
-# define SMALL_POOL 4096
-# define MAX_POOL 12288
+# define SIZE_SMALL_POOL 8192 // 128 alloc of 64
+# define SIZE_MAX_POOL 28672 //112 alloc of 256
 
 //global var for the allocation
 //contains the tiny and the small pool
 //first 4096 bytes correspond to the tiny pool, the rest is the small
-extern char memory_pool[12288];
+extern char memory_pool[SIZE_MAX_POOL];
 
 void    free(void *ptr);
 void    *malloc(size_t size);
