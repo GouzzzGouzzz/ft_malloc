@@ -21,9 +21,8 @@ $(OBJ_DIR)/%.o: %.c
 	$(CC) -c $(CFLAGS) $(LIBFT) -o $@ $<
 
 $(SYMLINK_NAME): $(NAME)
-ifeq ($(wildcard $(SYMLINK_NAME)),)
+	rm -f $(SYMLINK_NAME)
 	ln -s $(NAME) $(SYMLINK_NAME)
-endif
 
 $(NAME): $(OBJ)
 	$(MAKE) -C ./libft/ all
@@ -37,11 +36,10 @@ fclean: clean
 	$(MAKE) -C ./libft/ fclean
 	rm -f $(NAME) $(SYMLINK_NAME) main.o main
 
-test: re
+test: all
 	$(CC) $(CFLAGS) -c main.c -o main.o
 	gcc main.o -o main -L. -lft_malloc $(LIBFT) -Wl,-R.
 
 re: fclean all
 
-
-.PHONY: all clean fclean re test
+.PHONY: clean fclean all re test
