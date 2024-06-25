@@ -1,7 +1,12 @@
 #include "ft_malloc.h"
 
 int main(){
-    char *test = malloc(20);
+    memory_pool[0] = 't';
+    printf("%c\n", memory_pool[0]);
+    return 1;
+}
+
+    //char *test = malloc(20);
     // if (test == NULL)
     // {
     //     printf("CRASHED\n");
@@ -15,5 +20,3 @@ int main(){
     // {
     //     printf("test :%c, = %d\n", test[0], i);
     // }
-}
-

@@ -1,5 +1,4 @@
 #include "ft_malloc.h"
-# include <stdint.h>
 
 char memory_pool[12288];
 //return NULL si la pool small / tiny est full
@@ -37,7 +36,6 @@ void *malloc(size_t size)
         ptr = malloc_small(size, &small_size);
     else
         ptr = malloc_mmap(size);
-    printf("returning :%p", ptr);
     return ptr;
 }
 

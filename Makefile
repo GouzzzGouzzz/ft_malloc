@@ -5,6 +5,7 @@ endif
 NAME=libft_malloc_$(HOSTTYPE).so
 CFLAGS=-fPIC #-Wall -Werror -Wextra
 LIBFT=-Llibft/ -lft
+LIBMALLOC=-L. -lft_malloc
 CC=gcc
 SYMLINK_NAME=libft_malloc.so
 OBJ_DIR=obj
@@ -26,7 +27,7 @@ $(SYMLINK_NAME): $(NAME)
 
 $(NAME): $(OBJ)
 	$(MAKE) -C ./libft/ all
-	$(CC) -shared -o $(NAME) $(OBJ)
+	$(CC) $(CFLAGS) -shared -o $(NAME) $(OBJ)
 
 clean:
 	$(MAKE) -C ./libft/ clean
@@ -36,9 +37,9 @@ fclean: clean
 	$(MAKE) -C ./libft/ fclean
 	rm -f $(NAME) $(SYMLINK_NAME) main.o main
 
-test: all
+test: re
 	$(CC) $(CFLAGS) -c main.c -o main.o
-	gcc main.o -o main -L. -lft_malloc $(LIBFT) -Wl,-R.
+	$(CC) main.o -o main $(LIBMALLOC) $(LIBFT) -Wl,-rpath,./
 
 re: fclean all
 
