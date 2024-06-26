@@ -7,9 +7,9 @@ static void* malloc_small(size_t size, short int *tiny_size){
     if ((size_t)(*tiny_size) + size > SIZE_SMALL_POOL)
         return NULL;
     //Put the size of the chunks just before the start of what we give
-    //So it is placed a ptr - 1
-    printf("Allocating : %ld\n",size);
-     *(int *)(memory_pool + *tiny_size) = (int)size;
+    //So it is placed at ptr - 1
+    printf("Allocating small: %ld\n",size);
+    *(int *)(memory_pool + *tiny_size) = (int)size;
     //The pointer returned by malloc
     char *ptr = memory_pool + *tiny_size + sizeof(int);
     *tiny_size += size + sizeof(int);
@@ -19,9 +19,10 @@ static void* malloc_small(size_t size, short int *tiny_size){
 static void* malloc_medium(size_t size, short int *small_size){
     if ((size_t)(*small_size) + size + SIZE_SMALL_POOL > SIZE_MAX_POOL)
         return NULL;
-    *(int *)(memory_pool + *small_size) = size;
-    char *ptr = &memory_pool[SIZE_SMALL_POOL + *small_size];
-    *small_size += size;
+    printf("Allocating  medium: %ld\n",size);
+    *(int *)(memory_pool + *small_size + SIZE_SMALL_POOL) = (int)size;
+    char *ptr = memory_pool + SIZE_SMALL_POOL + *small_size + sizeof(int);
+    *small_size += size + sizeof(int);
     return ptr;
 }
 

@@ -7,7 +7,7 @@ int main(){
     char *test = malloc(20);
     for (int i = 0; i < 20; i++)
     {
-        test[i] = '1';
+        malloc(244);
     }
     if (test == NULL)
     {
@@ -16,4 +16,5 @@ int main(){
     }
     show_alloc_mem();
     free(test);
+    show_alloc_mem();
 }

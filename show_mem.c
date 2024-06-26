@@ -1,17 +1,8 @@
 #include "ft_malloc.h"
 
-    // TINY : 0xA0000
-    // 0xA0020 - 0xA004A : 42 bytes
-    // 0xA006A - 0xA00BE : 84 bytes
-    // SMALL : 0xAD000
-    // 0xAD020 - 0xADEAD : 3725 bytes
-    // LARGE : 0xB0000
-    // 0xB0020 - 0xBBEEF : 48847 bytes
-    // Total : 52698 bytes
-
 static void	ft_print_arr_rev(int size, char *tab)
 {
-	while (size > 1)
+	while (size > 0)
 	{
 		size--;
 		write(1, &tab[size], 1);
@@ -36,29 +27,62 @@ static void	ft_print_address(unsigned long address)
 	ft_print_arr_rev(i, address_arr);
 }
 
-static void calc_prealloc_small()
+static int calc_prealloc_small()
 {
-    char *ptr = memory_pool;
-    printf("%p - %p\n", (void *)ptr, memory_pool + SIZE_SMALL_POOL);
-    ft_putstr_fd("TINY : ", 1);
-    ft_print_address((unsigned long)&memory_pool[0]);
+    char *ptr = memory_pool + sizeof(int);
+    int total = 0;
+    write(1, "TINY : ", 8);
+    ft_print_address((unsigned long)memory_pool);
+    write(1, "\n", 1);
     while (ptr < memory_pool + SIZE_SMALL_POOL)
     {
         int size = GET_CHUNK_SIZE(ptr);
-        printf("%d\n", size);
+        total += size;
         if (size <= 0)
             break;
-        ft_print_address((unsigned long)&ptr);
-        ptr += size + sizeof(int);
+        ft_print_address((unsigned long)ptr);
+        ptr += size;
         write(1, " - ", 3);
-        ft_print_address((unsigned long)&ptr);
+        ft_print_address((unsigned long)ptr);
+        ptr += sizeof(int);
         write(1, " : ", 3);
         ft_putnbr_fd(size, 1);
-        write(1, "\n", 1);
+        write(1, " bytes\n", 8);
     }
+    return total;
+}
+
+static int calc_prealloc_medium()
+{
+    char *ptr = memory_pool + sizeof(int) + SIZE_SMALL_POOL;
+    int total = 0;
+    write(1, "SMALL : ", 9);
+    ft_print_address((unsigned long)memory_pool + SIZE_SMALL_POOL);
+    write(1, "\n", 1);
+    while (ptr < memory_pool + SIZE_MAX_POOL)
+    {
+        int size = GET_CHUNK_SIZE(ptr);
+        total += size;
+        if (size <= 0)
+            break;
+        ft_print_address((unsigned long)ptr);
+        ptr += size;
+        write(1, " - ", 3);
+        ft_print_address((unsigned long)ptr);
+        ptr += sizeof(int);
+        write(1, " : ", 3);
+        ft_putnbr_fd(size, 1);
+        write(1, " bytes\n", 8);
+    }
+    return total;
 }
 
 void show_alloc_mem()
 {
-    calc_prealloc_small();
+    int total = 0;
+    total += calc_prealloc_small();
+    total += calc_prealloc_medium();
+    write(1, "Total : ", 9);
+    ft_putnbr_fd(total, 1);
+    write(1, " bytes\n", 8);
 }
