@@ -14,6 +14,7 @@
 # define SIZE_MAX_POOL 28672 //112 alloc of 256
 
 //Some Macro will be useful
+#define SET_CHUNK_SIZE(ptr, size) (*(int *)((char *)(ptr) - sizeof(int)) = (int) size)
 #define GET_CHUNK_SIZE(ptr) (*(int *)((char *)(ptr) - sizeof(int)))
 #define SET_CHUNK_FREE(ptr) (*(int *)((char *)(ptr) - sizeof(int)) = (-1))
 
