@@ -14,6 +14,6 @@ int main(){
         printf("CRASHED\n");
         return 1;
     }
-    printf("%s\n", test);
+    show_alloc_mem();
     free(test);
 }

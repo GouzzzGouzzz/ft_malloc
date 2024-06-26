@@ -13,6 +13,10 @@
 # define SIZE_SMALL_POOL 8192 // 128 alloc of 64
 # define SIZE_MAX_POOL 28672 //112 alloc of 256
 
+//Some Macro will be useful
+#define GET_CHUNK_SIZE(ptr) (*(int *)((char *)(ptr) - sizeof(int)))
+#define SET_CHUNK_FREE(ptr) (*(int *)((char *)(ptr) - sizeof(int)) = (-1))
+
 //global var for the allocation
 //contains the tiny and the small pool
 //first 4096 bytes correspond to the tiny pool, the rest is the small
@@ -21,6 +25,7 @@ extern char memory_pool[SIZE_MAX_POOL];
 void    free(void *ptr);
 void    *malloc(size_t size);
 void    *realloc(void *ptr, size_t size);
+void    show_alloc_mem();
 
 //mmap(2)
 //munmap(2)

@@ -3,6 +3,7 @@
         "libft.h": "c",
         "ft_malloc.h": "c",
         "stdio.h": "c",
-        "stdbool.h": "c"
+        "stdbool.h": "c",
+        "type_traits": "c"
     }
 }

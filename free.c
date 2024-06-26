@@ -7,9 +7,8 @@ void free(void *ptr)
 {
     if (ptr == NULL)
         return ;
-    int *size_ptr = (int *)ptr - 1;
-    int size = *size_ptr;
-    *size_ptr = -1;
+    int size = GET_CHUNK_SIZE(ptr);
+    SET_CHUNK_FREE(ptr);
     for (int i = 0; i < size; i++)
         ((char *)ptr)[i] = '\0';
 }

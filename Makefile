@@ -12,7 +12,8 @@ OBJ_DIR=obj
 
 MANDATORY= malloc.c\
 	realloc.c\
-	free.c
+	free.c\
+	show_mem.c
 
 OBJ=$(MANDATORY:%.c=$(OBJ_DIR)/%.o)
 
