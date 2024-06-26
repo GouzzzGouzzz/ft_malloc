@@ -10,8 +10,8 @@
 # define SMALL_VALUE 64
 # define MEDIUM_VALUE 256
 //MAYBE -1 sur les valeurs
-# define SIZE_SMALL_POOL 8192 // 128 alloc of 64
-# define SIZE_MAX_POOL 28672 //112 alloc of 256
+# define SIZE_SMALL_POOL 8192 // 128 alloc of 60 + 4(for int)
+# define SIZE_MAX_POOL 28672 //112 alloc of 252 + 4 (for int)
 
 //Some Macro will be useful
 #define SET_CHUNK_SIZE(ptr, size) (*(int *)((char *)(ptr) - sizeof(int)) = (int) size)

@@ -31,15 +31,25 @@ static int calc_prealloc_small()
 {
     char *ptr = memory_pool + sizeof(int);
     int total = 0;
+
     write(1, "TINY : ", 8);
     ft_print_address((unsigned long)memory_pool);
     write(1, "\n", 1);
     while (ptr < memory_pool + SIZE_SMALL_POOL)
     {
         int size = GET_CHUNK_SIZE(ptr);
+        if (size == -1) //Skipping freed chunk
+        {
+            while (*ptr == '\0')
+            {
+                ptr++;
+                if (ptr + sizeof(int) == memory_pool + SIZE_SMALL_POOL)
+                    return total;
+            }
+            ptr += sizeof(int);
+            continue ;
+        }
         total += size;
-        if (size <= 0)
-            break;
         ft_print_address((unsigned long)ptr);
         ptr += size;
         write(1, " - ", 3);
@@ -56,15 +66,25 @@ static int calc_prealloc_medium()
 {
     char *ptr = memory_pool + sizeof(int) + SIZE_SMALL_POOL;
     int total = 0;
+
     write(1, "SMALL : ", 9);
     ft_print_address((unsigned long)memory_pool + SIZE_SMALL_POOL);
     write(1, "\n", 1);
     while (ptr < memory_pool + SIZE_MAX_POOL)
     {
         int size = GET_CHUNK_SIZE(ptr);
+        if (size == -1) //Skipping freed chunk
+        {
+            while (*ptr == '\0')
+            {
+                ptr++;
+                if (ptr + sizeof(int) == memory_pool + SIZE_MAX_POOL)
+                    return total;
+            }
+            ptr += sizeof(int);
+            continue ;
+        }
         total += size;
-        if (size <= 0)
-            break;
         ft_print_address((unsigned long)ptr);
         ptr += size;
         write(1, " - ", 3);

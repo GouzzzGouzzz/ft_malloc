@@ -4,17 +4,32 @@
 // #include <stdio.h>
 // # include "./libft/libft.h"
 int main(){
-    char *test = malloc(20);
-    for (int i = 0; i < 20; i++)
+    int i = 0;
+    char *s[128];
+    while (i < 200)
     {
-        malloc(244);
-    }
-    if (test == NULL)
-    {
-        printf("CRASHED\n");
-        return 1;
+        s[i] = malloc(60);
+        if (s[i] == NULL){
+            printf("NO MORE ROOM IN SMALL POOL\n");
+            break;
+        }
+        i++;
+        printf("%d == i\n",i);
     }
     show_alloc_mem();
-    free(test);
+    for (int i = 0; i < 128; i++)
+        free(s[i]);
     show_alloc_mem();
+    i = 0;
+    printf("REALLOCATING ALL\n");
+    while (i < 200)
+    {
+        s[i] = malloc(30);
+        if (s[i] == NULL){
+            printf("NO MORE ROOM IN SMALL POOL\n");
+            break;
+        }
+        i++;
+        printf("%d == i\n",i);
+    }
 }
