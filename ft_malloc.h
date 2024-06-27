@@ -32,6 +32,8 @@ void    show_alloc_mem();
 //munmap(2)
 //sysconf(_SC_PAGESIZE) under linux
 //getrlimit(2)
+void* find_chunk(char* start, char* end, int size_needed);
+int calc_free_area(char *start, char* end);
 
 #endif
 

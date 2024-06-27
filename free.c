@@ -7,6 +7,7 @@ void free(void *ptr)
 {
     if (ptr == NULL)
         return ;
+    // printf("received : %p, start of pool = %p, end = %p\n", ptr, memory_pool, memory_pool + SIZE_SMALL_POOL);
     int size = GET_CHUNK_SIZE(ptr);
     SET_CHUNK_FREE(ptr);
     for (int i = 0; i < size; i++)

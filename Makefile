@@ -3,7 +3,7 @@ ifeq ($(HOSTTYPE),)
 endif
 
 NAME=libft_malloc_$(HOSTTYPE).so
-CFLAGS=-fPIC #-Wall -Werror -Wextra
+CFLAGS=-fPIC -g -Wall -Werror -Wextra
 LIBFT=-Llibft/ -lft
 LIBMALLOC=-L. -lft_malloc
 CC=gcc
