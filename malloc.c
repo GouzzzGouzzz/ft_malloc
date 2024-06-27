@@ -27,7 +27,7 @@ void* find_chunk(char* start, char* end, int size_needed)
     start += sizeof(int); // we start after the chunk headers
     while (start < end)
     {
-        size = GET_CHUNK_SIZE(start);
+        size = GET_CHUNK_SIZE(start); // this give -256 it should not be possible
         if (size == -1) // Found the start of a free area / chunk
         {
             char *chunk_start = start; //chunk_start is always after the header
@@ -44,7 +44,11 @@ void* find_chunk(char* start, char* end, int size_needed)
             }
             start = chunk_start;
         }
-        start += size + sizeof(int);
+        else
+        {
+            start += size + sizeof(int);
+            printf("Added size : %d\n",size);
+        }
     }
     return NULL;
 }
