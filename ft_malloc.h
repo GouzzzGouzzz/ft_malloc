@@ -19,8 +19,8 @@
 #define SET_CHUNK_FREE(ptr) (*(int *)((char *)(ptr) - sizeof(int)) = (-1))
 
 //global var for the allocation
-//contains the tiny and the small pool
-//first 4096 bytes correspond to the tiny pool, the rest is the small
+//contains the small and the medium pool
+//first SIZE_SMALL_POOL bytes correspond to the small pool, the rest is the medium
 extern char memory_pool[SIZE_MAX_POOL];
 
 void    free(void *ptr);

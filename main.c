@@ -5,31 +5,39 @@
 // # include "./libft/libft.h"
 int main(){
     int i = 0;
-    char *s[128];
-    while (i < 200)
+    // char mem[40];
+    // ft_bzero(mem, 40);
+    // SET_CHUNK_FREE(mem + sizeof(int));
+    // SET_CHUNK_FREE(mem + 14 + sizeof(int));
+    // for (int i = 0; i < 4; i++)
+    //     printf("%c\n", mem[i]);
+    // if (GET_CHUNK_SIZE(mem + 10 + sizeof(int)) == 0)
+    //     printf("DONE\n");
+
+    char *s[2000];
+    int total = 0;
+    int size = 2;
+    while (1)
     {
-        s[i] = malloc(60);
+        s[i] = malloc(size);
         if (s[i] == NULL){
-            printf("NO MORE ROOM IN SMALL POOL\n");
+            printf("NO MORE ROOM IN SMALL POOL after %d alloc, total of %d bytes\n", i, (i * size) + (i * 4));
+            total = i;
             break;
         }
         i++;
-        printf("%d == i\n",i);
     }
-    show_alloc_mem();
-    for (int i = 0; i < 128; i++)
+    for (int i = 0; i < total; i++)
         free(s[i]);
-    show_alloc_mem();
     i = 0;
-    printf("REALLOCATING ALL\n");
-    while (i < 200)
+    printf("REALLOCATING ALL : EXPECTING 1638 allocs\n");
+    while (1)
     {
-        s[i] = malloc(30);
+        s[i] = malloc(1);
         if (s[i] == NULL){
-            printf("NO MORE ROOM IN SMALL POOL\n");
+            printf("NO MORE ROOM IN SMALL POOL after %d alloc\n", i);
             break;
         }
         i++;
-        printf("%d == i\n",i);
     }
 }
