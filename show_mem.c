@@ -29,7 +29,7 @@ static void	ft_print_address(unsigned long address)
 
 static int calc_prealloc_small()
 {
-    char *ptr = memory_pool + sizeof(int);
+    char *ptr = memory_pool + sizeof(size_t);
     int total = 0;
 
     write(1, "TINY : ", 8);
@@ -43,10 +43,10 @@ static int calc_prealloc_small()
             while (*ptr == '\0')
             {
                 ptr++;
-                if (ptr + sizeof(int) == memory_pool + SIZE_SMALL_POOL)
+                if (ptr + sizeof(size_t) == memory_pool + SIZE_SMALL_POOL)
                     return total;
             }
-            ptr += sizeof(int);
+            ptr += sizeof(size_t);
             continue ;
         }
         total += size;
@@ -54,7 +54,7 @@ static int calc_prealloc_small()
         ptr += size;
         write(1, " - ", 3);
         ft_print_address((unsigned long)ptr);
-        ptr += sizeof(int);
+        ptr += sizeof(size_t);
         write(1, " : ", 3);
         ft_putnbr_fd(size, 1);
         write(1, " bytes\n", 8);
@@ -64,7 +64,7 @@ static int calc_prealloc_small()
 
 static int calc_prealloc_medium()
 {
-    char *ptr = memory_pool + sizeof(int) + SIZE_SMALL_POOL;
+    char *ptr = memory_pool + sizeof(size_t) + SIZE_SMALL_POOL;
     int total = 0;
 
     write(1, "SMALL : ", 9);
@@ -78,10 +78,10 @@ static int calc_prealloc_medium()
             while (*ptr == '\0')
             {
                 ptr++;
-                if (ptr + sizeof(int) == memory_pool + SIZE_MAX_POOL)
+                if (ptr + sizeof(size_t) == memory_pool + SIZE_MAX_POOL)
                     return total;
             }
-            ptr += sizeof(int);
+            ptr += sizeof(size_t);
             continue ;
         }
         total += size;
@@ -89,7 +89,7 @@ static int calc_prealloc_medium()
         ptr += size;
         write(1, " - ", 3);
         ft_print_address((unsigned long)ptr);
-        ptr += sizeof(int);
+        ptr += sizeof(size_t);
         write(1, " : ", 3);
         ft_putnbr_fd(size, 1);
         write(1, " bytes\n", 8);
