@@ -10,13 +10,15 @@ int calc_free_area(char *start, char* end)
     {
         if (GET_CHUNK_SIZE(start_ptr) == -1)
         {
-            while (*start_ptr == '\0')
+            while (start_ptr < end && *start_ptr == '\0')
                 start_ptr++;
             start_ptr += sizeof(int);
         }
         else
             break;
     }
+    if (start_ptr - start == 0)
+        return 0;
     return start_ptr - start - sizeof(int);
 }
 
@@ -55,11 +57,11 @@ void* find_chunk(char* start, char* end, int size_needed)
 
 static void* malloc_small(size_t size){
     char *ptr = find_chunk(memory_pool, memory_pool + SIZE_SMALL_POOL, size);
-    // printf("RETURNING PTR TO = %p\n", ptr);
     if (ptr == NULL){
-        printf("SMALL POOL IS FULL\n");
+        // printf("SMALL POOL IS FULL\n");
         return NULL;
     }
+    printf("Returning :%p\n",ptr);
     return ptr;
 }
 
@@ -79,7 +81,7 @@ static void* malloc_mmap(size_t size){
 void *malloc(size_t size)
 {
     static bool init = true;
-    char *ptr;
+    char *ptr = NULL;
 
     if (init)
     {

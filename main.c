@@ -10,14 +10,27 @@ int main(){
     SET_CHUNK_FREE(pool + sizeof(int) + 20);
     SET_CHUNK_FREE(pool + sizeof(int) + 42);
     SET_CHUNK_FREE(pool + sizeof(int) + 192);
+
+    SET_CHUNK_SIZE(pool + 40 + sizeof(int), 10);
+
     SET_CHUNK_FREE(pool + sizeof(int) + 143);
     SET_CHUNK_FREE(pool + sizeof(int) + 120);
     SET_CHUNK_FREE(pool + sizeof(int) + 230);
     SET_CHUNK_FREE(pool + sizeof(int) + 250);
-    printf("area = %d\n", calc_free_area(pool + sizeof(int), pool + 300));
 
     //TEST THE FREE FUNCTION TO SEE IF IT IS NOT OVERWRITNG OR ANYTHING
 
+    char *test = malloc(10);
+    for (int i = 0;i < 10; i++)
+        test[i] = 's';
+    for (int i = 0;i < 20; i++)
+        printf("%c ", test[i]);
+    printf("\n");
+    free(test);
+    test = malloc(10);
+    for (int i = 0;i < 20; i++)
+        printf("%c ", test[i]);
+    printf("\n");
     // char *s[2000];
     // for (int i = 0; i < 2000; i++)
     //     s[i] = NULL;
