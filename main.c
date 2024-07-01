@@ -63,7 +63,4 @@ int main(){
     //         printf("BLOCK ALLOCATED: %d\n",i + 1);
     //     printf("\n\n");
     // }
-    malloc(7);
-    malloc(244);
-    show_alloc_mem();
 }

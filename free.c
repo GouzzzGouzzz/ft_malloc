@@ -5,13 +5,25 @@
 
 void free(void *ptr)
 {
+    int size;
+
     if (GET_CHUNK_SIZE(memory_pool + sizeof(size_t)) == 0)
         init_malloc();
-    if (ptr == NULL || ptr == memory_pool + SIZE_MAX_POOL)
+    if (ptr == NULL || ptr == memory_pool + SIZE_MAX_POOL + ZERO_SIZE_BLOCK)
         return ;
-    int size = GET_CHUNK_SIZE(ptr);
-    SET_CHUNK_FREE(ptr);
-    for (int i = 0; i < size; i++)
-        ((char *)ptr)[i] = '\0';
-    printf("Freed %d bytes from : %p\n", size, ptr);
+    size = GET_CHUNK_SIZE(ptr);
+    if (ptr >= memory_pool && ptr <= memory_pool + SIZE_MAX_POOL)
+    {
+        SET_CHUNK_FREE(ptr);
+        for (int i = 0; i < size; i++)
+            ((char *)ptr)[i] = '\0';
+    }
+    else
+    {
+        //check if this part of the memory doesn t store any chunk
+        //IF PREV_ADDR == NULL --> need to change inside memory_pool
+        //then modify the previous "NEXT_ADDR" to point to the next current ptr
+        //modify the next chunk "PREV_ADDR" to the addres of the current ptr
+        //munmap(ptr, size);
+    }
 }
