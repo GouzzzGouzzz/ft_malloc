@@ -6,11 +6,11 @@ char memory_pool[SIZE_MAX_POOL + ZERO_SIZE_BLOCK];
 static int round_up_align(size_t size)
 {
     int remainder;
-    remainder = size % 8;
+    remainder = size % sizeof(size_t);
     if (remainder == 0)
         return size;
 
-    return size + 8 - remainder;
+    return size + sizeof(size_t) - remainder;
 }
 
 int calc_free_area(char *start, char *end)
@@ -35,12 +35,12 @@ void* find_chunk(char* start, char* end, size_t size_needed)
     while (start < end)
     {
         size = GET_CHUNK_SIZE(start);
-        printf("start == %p, end = %p / size = %d\n", start, end, size);
+        // printf("start == %p, end = %p / size = %d\n", start, end, size);
         if (size == -1) // Found the start of a free area / chunk
         {
             int chunk_size;
             chunk_size = calc_free_area(start, end);
-            printf("chunk_szie = %d\n", chunk_size);
+            printf("chunk_szie = %d, size_needed = %d\n", chunk_size, size_needed);
             if (chunk_size >= size_needed)
             {
                 printf("allocated a block of %ld inside a chunk size =%d\n", size_needed, chunk_size);
@@ -54,7 +54,7 @@ void* find_chunk(char* start, char* end, size_t size_needed)
         else
         {
             start += size + sizeof(size_t);
-            printf("Added size : %d\n",size);
+            // printf("Added size : %d\n",size);
         }
     }
     printf("NOT OFUDN\n");
@@ -83,20 +83,21 @@ static void* malloc_mmap(size_t size){
     return NULL;
 }
 
+void init_malloc()
+{
+    ft_bzero(memory_pool, SIZE_MAX_POOL);
+    //MARK BOTH POOL AS FREE
+    SET_CHUNK_FREE(memory_pool + sizeof(size_t));
+    SET_CHUNK_FREE(memory_pool + sizeof(size_t) + SIZE_SMALL_POOL);
+}
+
 void *malloc(size_t size)
 {
-    static bool init = true;
     char *ptr = NULL;
+    if (GET_CHUNK_SIZE(memory_pool + sizeof(size_t)) == 0)
+        init_malloc();
     if (size == 0)
         return memory_pool + SIZE_MAX_POOL;
-    if (init)
-    {
-        ft_bzero(memory_pool, SIZE_MAX_POOL);
-        init = false;
-        //MARK BOTH POOL AS FREE
-        SET_CHUNK_FREE(memory_pool + sizeof(size_t));
-        SET_CHUNK_FREE(memory_pool + sizeof(size_t) + SIZE_SMALL_POOL);
-    }
     if (size > 9223372036854775807)
         return NULL;
     if (size <= SMALL_VALUE)

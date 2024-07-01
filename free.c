@@ -5,6 +5,8 @@
 
 void free(void *ptr)
 {
+    if (GET_CHUNK_SIZE(memory_pool + sizeof(size_t)) == 0)
+        init_malloc();
     if (ptr == NULL || ptr == memory_pool + SIZE_MAX_POOL)
         return ;
     int size = GET_CHUNK_SIZE(ptr);

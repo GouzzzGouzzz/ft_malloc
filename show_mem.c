@@ -32,13 +32,13 @@ static int calc_prealloc_small()
     char *ptr = memory_pool + sizeof(size_t);
     int total = 0;
 
-    write(1, "TINY : ", 8);
+    write(1, "SMALL : ", 9);
     ft_print_address((unsigned long)memory_pool);
     write(1, "\n", 1);
     while (ptr < memory_pool + SIZE_SMALL_POOL)
     {
         int size = GET_CHUNK_SIZE(ptr);
-        if (size == -1) //Skipping freed chunk
+        if (size <= -1) //Skipping freed chunk
         {
             while (*ptr == '\0')
             {
@@ -67,13 +67,13 @@ static int calc_prealloc_medium()
     char *ptr = memory_pool + sizeof(size_t) + SIZE_SMALL_POOL;
     int total = 0;
 
-    write(1, "SMALL : ", 9);
+    write(1, "MEDIUM : ", 10);
     ft_print_address((unsigned long)memory_pool + SIZE_SMALL_POOL);
     write(1, "\n", 1);
     while (ptr < memory_pool + SIZE_MAX_POOL)
     {
         int size = GET_CHUNK_SIZE(ptr);
-        if (size == -1) //Skipping freed chunk
+        if (size <= -1) //Skipping freed chunk
         {
             while (*ptr == '\0')
             {
@@ -100,8 +100,16 @@ static int calc_prealloc_medium()
 void show_alloc_mem()
 {
     int total = 0;
+    int medium_total = 0;
+    if (GET_CHUNK_SIZE(memory_pool + sizeof(size_t)) == 0)
+        init_malloc();
     total += calc_prealloc_small();
-    total += calc_prealloc_medium();
+    if (total == 0)
+        write(1, "None\n",6);
+    medium_total += calc_prealloc_medium();
+    if (medium_total == 0)
+        write(1, "None\n",6);
+    total += medium_total;
     write(1, "Total : ", 9);
     ft_putnbr_fd(total, 1);
     write(1, " bytes\n", 8);

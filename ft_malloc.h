@@ -4,14 +4,14 @@
 # include <sys/resource.h>
 # include "./libft/libft.h"
 # include <stdio.h>
-# include <stdbool.h>
 
 //REVOIR LES VALEURS PLUS TARD (need +1 pour la size des chunks + moins grandre valeur ?)
 # define SMALL_VALUE 64
 # define MEDIUM_VALUE 256
 //MAYBE -1 sur les valeurs
-# define SIZE_SMALL_POOL 288 // 128 alloc of 60 + 4(for int) temp : 8192
-# define SIZE_MAX_POOL 28672 //112 alloc of 252 + 4 (for int)
+# define SIZE_SMALL_POOL 8192 // 118 alloc of 64 (for int)
+# define SIZE_MEDIUM_POOL 28672 // 108 alloc of 256
+# define SIZE_MAX_POOL SIZE_SMALL_POOL + SIZE_MEDIUM_POOL
 
 //Some Macro will be useful
 #define SET_CHUNK_SIZE(ptr, size) (*(int *)((char *)(ptr) - sizeof(size_t)) = (int) size)
@@ -30,7 +30,7 @@ void    free(void *ptr);
 void    *malloc(size_t size);
 void    *realloc(void *ptr, size_t size);
 void    show_alloc_mem();
-
+void    init_malloc();
 //mmap(2)
 //munmap(2)
 //sysconf(_SC_PAGESIZE) under linux
