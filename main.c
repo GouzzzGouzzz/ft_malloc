@@ -1,8 +1,8 @@
 #include "ft_malloc.h"
 
-// #include <stdlib.h>
-// #include <stdio.h>
-// # include "./libft/libft.h"
+#include <stdlib.h>
+#include <stdio.h>
+# include "./libft/libft.h"
 
 /*
 THOSE TEST WERE WORKING
@@ -29,9 +29,6 @@ THOSE TEST WERE WORKING
     //         printf("BLOCK ALLOCATED: %d\n",i + 1);
     //     printf("\n\n");
     // }
-
-
-int main(){
     // char pool[200];
     // ft_bzero(pool, 200);
     // SET_CHUNK_SIZE(pool + sizeof(int), 10);
@@ -63,4 +60,20 @@ int main(){
     //         printf("BLOCK ALLOCATED: %d\n",i + 1);
     //     printf("\n\n");
     // }
+
+int main(){
+    char *s[2000];
+    my_malloc(2);
+    my_malloc(200);
+    for (int i = 0; i < 22; i++)
+    {
+        s[i] = my_malloc(8000);
+    }
+    show_alloc_mem();
+    // for (int i = 0; i < 12; i++)
+    // {
+    //     free(s[i]);
+    // }
+    return 1;
 }
+

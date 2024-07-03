@@ -9,10 +9,10 @@ void free(void *ptr)
 
     if (GET_CHUNK_SIZE(memory_pool + sizeof(size_t)) == 0)
         init_malloc();
-    if (ptr == NULL || ptr == memory_pool + SIZE_MAX_POOL + ZERO_SIZE_BLOCK)
+    if (ptr == NULL || ptr == memory_pool + SIZE_MAX_POOL)
         return ;
     size = GET_CHUNK_SIZE(ptr);
-    if (ptr >= memory_pool && ptr <= memory_pool + SIZE_MAX_POOL)
+    if ((char *)ptr >= memory_pool && (char *)ptr <= memory_pool + SIZE_MAX_POOL)
     {
         SET_CHUNK_FREE(ptr);
         for (int i = 0; i < size; i++)
@@ -20,6 +20,7 @@ void free(void *ptr)
     }
     else
     {
+
         //check if this part of the memory doesn t store any chunk
         //IF PREV_ADDR == NULL --> need to change inside memory_pool
         //then modify the previous "NEXT_ADDR" to point to the next current ptr
