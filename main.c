@@ -63,20 +63,21 @@ THOSE TEST WERE WORKING
 
 int main(){
     char *s[2000];
-    for (int i = 0; i < 1; i++)
+    for (int i = 0; i < 12; i++)
     {
         s[i] = my_malloc(8000);
     }
-    // for (int i = 0; i < 1000; i++)
-    // {
-    //     s[0][i] = 'x';
-    // }
-    free(s[0]);
+    for (int i = 0; i < 1000; i++)
+    {
+        s[0][i] = 'x';
+    }
     // show_alloc_mem();
-    // for (int i = 0; i < 12; i++)
-    // {
-    //     free(s[i]);
-    // }
+    for (int i = 0; i < 12; i++)
+    {
+        my_free(s[i]);
+    }
+    // show_alloc_mem();
     return 1;
 }
+
 

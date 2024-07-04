@@ -50,7 +50,7 @@ static int calc_prealloc_small()
     char *ptr = memory_pool + sizeof(size_t);
     int total = 0;
 
-    print_start_addr("SMALL :", memory_pool);
+    print_start_addr("SMALL  : ", memory_pool);
     while (ptr < memory_pool + SIZE_SMALL_POOL)
     {
         int size = GET_CHUNK_SIZE(ptr);
@@ -78,7 +78,7 @@ static int calc_prealloc_medium()
     char *ptr = memory_pool + sizeof(size_t) + SIZE_SMALL_POOL;
     int total = 0;
 
-    print_start_addr("MEDIUM :", memory_pool + SIZE_SMALL_POOL);
+    print_start_addr("MEDIUM : ", memory_pool + SIZE_SMALL_POOL);
     while (ptr < memory_pool + SIZE_MAX_POOL)
     {
         int size = GET_CHUNK_SIZE(ptr);
@@ -109,7 +109,7 @@ static int calc_mmap_alloc()
     char *end_ptr;
 
     ptr = *(void**)(memory_pool + START_LARGE);
-    print_start_addr("LARGE :", ptr);
+    print_start_addr("LARGE  : ", ptr);
     if (!ptr)
         return 0;
     next_ptr = *(void**)(ptr);

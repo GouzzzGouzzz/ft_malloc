@@ -55,7 +55,7 @@ static char* init_mmap(int size_to_map, int size_needed)
     *(void**)(memory_pool + START_LARGE) = ptr;
     SET_PREV_ADRR(ptr, NULL);
     SET_NEXT_ADDR(ptr, NULL);
-    printf("FIRST ALLOCATION AT:%p with size of %d\n", ptr, size_to_map);
+    // printf("FIRST ALLOCATION AT:%p with size of %d\n", ptr, size_to_map);
     return ptr + START_MMAP_ALLOC;
 }
 
@@ -69,7 +69,7 @@ static char* add_mmap_alloc(int size_to_map, int size_needed, char *curr_ptr)
     SET_NEXT_ADDR(ptr, NULL);
     SET_PREV_ADRR(ptr, curr_ptr);
     SET_NEXT_ADDR(curr_ptr, ptr);
-    printf("Allocated a new map block at : %p sizeof %d\n", ptr, size_to_map);
+    // printf("Allocated a new map block at : %p sizeof %d\n", ptr, size_to_map);
     return ptr + START_MMAP_ALLOC;
 }
 

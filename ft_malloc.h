@@ -34,7 +34,7 @@
 extern char memory_pool[SIZE_MAX_POOL + ZERO_SIZE_BLOCK + sizeof(void *)];
 
 //Main functions
-void    free(void *ptr);
+void    my_free(void *ptr);
 void    *my_malloc(size_t size);
 void    *realloc(void *ptr, size_t size);
 void    show_alloc_mem();

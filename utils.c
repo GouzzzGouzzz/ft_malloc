@@ -21,7 +21,7 @@ int calc_free_area(char *start, char *end)
 {
     char *start_ptr = start;
 
-    while (GET_CHUNK_SIZE(start_ptr) == -1)
+    while (start_ptr < end && GET_CHUNK_SIZE(start_ptr) == -1)
     {
         while (start_ptr < end && *start_ptr == '\0')
             start_ptr++;
