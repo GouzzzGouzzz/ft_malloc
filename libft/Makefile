@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: gouz <gouz@student.42.fr>                  +#+  +:+       +#+         #
+#    By: nmorandi <nmorandi@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/10/06 14:02:56 by nmorandi          #+#    #+#              #
-#    Updated: 2024/06/24 16:32:12 by gouz             ###   ########.fr        #
+#    Updated: 2024/07/05 14:23:52 by nmorandi         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -46,7 +46,10 @@ OBJ=$(MANDATORY:%.c=$(OBJ_DIR)/%.o)
 
 all: $(NAME)
 
-$(OBJ_DIR)/%.o: %.c
+$(OBJ_DIR):
+	mkdir -p $(OBJ_DIR)
+
+$(OBJ_DIR)/%.o: %.c | $(OBJ_DIR)
 	$(CC) -c $(CFLAGS) -o $@ $<
 
 $(NAME): $(OBJ)
@@ -54,7 +57,7 @@ $(NAME): $(OBJ)
 	ranlib $(NAME)
 
 clean:
-	rm -f $(OBJ_DIR)/*.o
+	rm -rf $(OBJ_DIR)
 
 fclean: clean
 	rm -f $(NAME)

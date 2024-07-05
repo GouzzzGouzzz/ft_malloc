@@ -20,7 +20,10 @@ OBJ=$(MANDATORY:%.c=$(OBJ_DIR)/%.o)
 
 all: $(SYMLINK_NAME)
 
-$(OBJ_DIR)/%.o: %.c
+$(OBJ_DIR):
+	mkdir -p $(OBJ_DIR)
+
+$(OBJ_DIR)/%.o: %.c | $(OBJ_DIR)
 	$(CC) -c $(CFLAGS) $(LIBFT) -o $@ $<
 
 $(SYMLINK_NAME): $(NAME)
@@ -33,7 +36,7 @@ $(NAME): $(OBJ)
 
 clean:
 	$(MAKE) -C ./libft/ clean
-	rm -f $(OBJ_DIR)/*.o
+	rm -rf $(OBJ_DIR)
 
 fclean: clean
 	$(MAKE) -C ./libft/ fclean
