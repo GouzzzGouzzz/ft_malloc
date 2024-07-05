@@ -2,34 +2,6 @@
 
 char memory_pool[SIZE_MAX_POOL + ZERO_SIZE_BLOCK + sizeof(void *)];
 
-static void* find_chunk(char* start, char* end, size_t size_needed)
-{
-    int size;
-
-    size_needed = round_up_align(size_needed, sizeof(size_t));
-    start += sizeof(size_t);
-    while (start < end)
-    {
-        size = GET_CHUNK_SIZE(start);
-        if (size == -1)
-        {
-            int chunk_size;
-            chunk_size = calc_free_area(start, end);
-            if (chunk_size >= (int)size_needed)
-            {
-                SET_CHUNK_SIZE(start, size_needed);
-                if (start + size_needed + sizeof(size_t) < end && GET_CHUNK_SIZE(start + size_needed + sizeof(size_t)) == 0)
-                    SET_CHUNK_FREE(start + size_needed + sizeof(size_t));
-                return start;
-            }
-            start += chunk_size;
-        }
-        else
-            start += size + sizeof(size_t);
-    }
-    return NULL;
-}
-
 static char* new_mmap_alloc(int size_to_map, int size_needed)
 {
     char *ptr;
@@ -37,7 +9,6 @@ static char* new_mmap_alloc(int size_to_map, int size_needed)
     ptr = mmap(NULL, size_to_map, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
     if (ptr == MAP_FAILED)
         return NULL;
-    ft_bzero(ptr, size_to_map);
     SET_CHUNK_SIZE(ptr + START_MMAP_ALLOC, size_needed);
     SET_ALLOC_SIZE(ptr, size_to_map);
     if (ptr + START_MMAP_ALLOC + size_needed < ptr + size_to_map)

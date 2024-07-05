@@ -43,5 +43,7 @@ void    show_alloc_mem();
 void    init_malloc();
 int     round_up_align(size_t size, int align_to);
 int     calc_free_area(char *start, char *end);
+char*   find_start(char* to_find);
+void* find_chunk(char* start, char* end, size_t size_needed);
 
 #endif

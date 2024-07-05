@@ -1,29 +1,5 @@
 #include "ft_malloc.h"
 
-static char* find_start(char* to_find)
-{
-    char *ptr;
-    char *next_ptr;
-    char *end_ptr;
-
-    ptr = *(void**)(memory_pool + START_LARGE);
-    if (!ptr)
-        return NULL;
-    next_ptr = *(void**)(ptr);
-    end_ptr = (ptr + GET_ALLOC_SIZE(ptr));
-    ptr += START_MMAP_ALLOC;
-    while (ptr != NULL)
-    {
-        if (ptr <= to_find && to_find <= end_ptr)
-            return ptr - START_MMAP_ALLOC;
-        ptr = next_ptr;
-        next_ptr = *(void**)(ptr);
-        end_ptr = (ptr + GET_ALLOC_SIZE(ptr));
-        ptr += START_MMAP_ALLOC;
-    }
-    return NULL;
-}
-
 static void unmap_link(char* ptr, size_t size)
 {
     char *prev;
