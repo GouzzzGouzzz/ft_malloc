@@ -4,6 +4,8 @@
 # include <sys/resource.h>
 # include "./libft/libft.h"
 
+#include <stdio.h>
+
 //Various value to simplify memory access for my array / ptr
 # define ZERO_SIZE_BLOCK 16
 # define SMALL_VALUE 64
@@ -33,8 +35,10 @@
 extern char memory_pool[SIZE_MAX_POOL + ZERO_SIZE_BLOCK + sizeof(void *)];
 
 //Main functions
-void    free(void *ptr);
-void    *malloc(size_t size);
+// void    free(void *ptr);
+// void    *malloc(size_t size);
+void    my_free(void *ptr);
+void    *my_malloc(size_t size);
 void    *realloc(void *ptr, size_t size);
 void    show_alloc_mem();
 

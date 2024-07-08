@@ -37,7 +37,7 @@ static void unmap_link(char* ptr, size_t size)
     return ;
 }
 
-void free(void *ptr)
+void my_free(void *ptr)
 {
     int size;
 

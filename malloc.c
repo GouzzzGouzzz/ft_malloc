@@ -13,6 +13,7 @@ static char* new_mmap_alloc(int size_to_map, int size_needed)
     SET_ALLOC_SIZE(ptr, size_to_map);
     if (ptr + START_MMAP_ALLOC + size_needed < ptr + size_to_map)
         SET_CHUNK_FREE(ptr + START_MMAP_ALLOC + size_needed + sizeof(size_t));
+    printf("mmap at : %p\n", ptr);
     return ptr;
 }
 
@@ -20,13 +21,15 @@ static char* init_mmap(int size_to_map, int size_needed)
 {
     void *ptr;
 
+    ft_putstr_fd("FIRST MMAP\n",1);
     ptr = new_mmap_alloc(size_to_map, size_needed);
     if (ptr == NULL)
         return NULL;
-    ft_memcpy(memory_pool + START_LARGE, &ptr, sizeof(void *));
+    *(void **)(char *)(memory_pool + START_LARGE) = (void *)ptr;
+    char * curr_ptr = *(void **)(char *)(memory_pool + START_LARGE);
+    printf("STOCKED : %p\n", curr_ptr + START_LARGE);
     SET_PREV_ADRR(ptr, NULL);
     SET_NEXT_ADDR(ptr, NULL);
-    ft_putstr_fd("FIRST MMAP\n",1);
     return ptr + START_MMAP_ALLOC;
 }
 
@@ -40,7 +43,6 @@ static char* add_mmap_alloc(int size_to_map, int size_needed, char *curr_ptr)
     SET_NEXT_ADDR(ptr, NULL);
     SET_PREV_ADRR(ptr, curr_ptr);
     SET_NEXT_ADDR(curr_ptr, ptr);
-    ft_putstr_fd("ADDED NEW MMAP ALLOC\n",1);
     return ptr + START_MMAP_ALLOC;
 }
 
@@ -53,7 +55,8 @@ void* malloc_mmap(size_t size_needed, char *curr_alloc)
 
     size_needed = round_up_align(size_needed, sizeof(size_t));
     size_to_map = round_up_align(size_needed + START_MMAP_ALLOC, sysconf(_SC_PAGESIZE));
-    ft_memcpy(&curr_ptr, memory_pool + START_LARGE, sizeof(void*));
+    curr_ptr = (char *)(void*)(memory_pool + START_LARGE);
+    printf("in mem : %p\n", curr_ptr);
     if (!curr_ptr)
     {
         return init_mmap(size_to_map, size_needed);
@@ -83,7 +86,7 @@ static void* malloc_prealloc(char *start, char *end, size_t size)
     return ptr;
 }
 
-void *malloc(size_t size)
+void *my_malloc(size_t size)
 {
     char *ptr = NULL;
 
@@ -98,9 +101,7 @@ void *malloc(size_t size)
     else if (size <= MEDIUM_VALUE)
         ptr = malloc_prealloc(memory_pool + SIZE_SMALL_POOL, memory_pool + SIZE_MAX_POOL, size);
     else
-    {
         ptr = malloc_mmap(size, NULL);
-    }
     return ptr;
 }
 
