@@ -4,7 +4,7 @@ char memory_pool[SIZE_MAX_POOL + ZERO_SIZE_BLOCK + sizeof(void *)];
 
 static char* new_mmap_alloc(int size_to_map, int size_needed)
 {
-    char *ptr;
+    void *ptr;
 
     ptr = mmap(NULL, size_to_map, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
     if (ptr == MAP_FAILED)
@@ -18,15 +18,15 @@ static char* new_mmap_alloc(int size_to_map, int size_needed)
 
 static char* init_mmap(int size_to_map, int size_needed)
 {
-    char *ptr;
+    void *ptr;
 
     ptr = new_mmap_alloc(size_to_map, size_needed);
     if (ptr == NULL)
         return NULL;
-    *(void**)(memory_pool + START_LARGE) = ptr;
+    ft_memcpy(memory_pool + START_LARGE, &ptr, sizeof(void *));
     SET_PREV_ADRR(ptr, NULL);
     SET_NEXT_ADDR(ptr, NULL);
-    // printf("FIRST ALLOCATION AT:%p with size of %d\n", ptr, size_to_map);
+    ft_putstr_fd("FIRST MMAP\n",1);
     return ptr + START_MMAP_ALLOC;
 }
 
@@ -40,11 +40,12 @@ static char* add_mmap_alloc(int size_to_map, int size_needed, char *curr_ptr)
     SET_NEXT_ADDR(ptr, NULL);
     SET_PREV_ADRR(ptr, curr_ptr);
     SET_NEXT_ADDR(curr_ptr, ptr);
-    // printf("Allocated a new map block at : %p sizeof %d\n", ptr, size_to_map);
+    ft_putstr_fd("ADDED NEW MMAP ALLOC\n",1);
     return ptr + START_MMAP_ALLOC;
 }
 
-static void* malloc_mmap(size_t size_needed){
+void* malloc_mmap(size_t size_needed, char *curr_alloc)
+{
     void* ptr = NULL;
     char *curr_ptr;
     char *end_ptr;
@@ -52,7 +53,7 @@ static void* malloc_mmap(size_t size_needed){
 
     size_needed = round_up_align(size_needed, sizeof(size_t));
     size_to_map = round_up_align(size_needed + START_MMAP_ALLOC, sysconf(_SC_PAGESIZE));
-    curr_ptr = *(void**)(memory_pool + START_LARGE);
+    ft_memcpy(&curr_ptr, memory_pool + START_LARGE, sizeof(void*));
     if (!curr_ptr)
     {
         return init_mmap(size_to_map, size_needed);
@@ -62,7 +63,7 @@ static void* malloc_mmap(size_t size_needed){
         while (curr_ptr != NULL)
         {
             end_ptr = (curr_ptr + GET_ALLOC_SIZE(curr_ptr));
-            ptr = find_chunk(curr_ptr + sizeof(size_t) + (2 * sizeof(void *)), end_ptr, size_needed);
+            ptr = find_chunk(curr_ptr + sizeof(size_t) + (2 * sizeof(void *)), end_ptr, size_needed, curr_alloc);
             if (ptr != NULL)
                 return ptr;
             if (!*(void**)(curr_ptr))
@@ -75,14 +76,14 @@ static void* malloc_mmap(size_t size_needed){
 
 static void* malloc_prealloc(char *start, char *end, size_t size)
 {
-    char *ptr = find_chunk(start, end, size);
+    char *ptr = find_chunk(start, end, size, NULL);
 
     if (ptr == NULL)
         return NULL;
     return ptr;
 }
 
-void *my_malloc(size_t size)
+void *malloc(size_t size)
 {
     char *ptr = NULL;
 
@@ -97,7 +98,9 @@ void *my_malloc(size_t size)
     else if (size <= MEDIUM_VALUE)
         ptr = malloc_prealloc(memory_pool + SIZE_SMALL_POOL, memory_pool + SIZE_MAX_POOL, size);
     else
-        ptr = malloc_mmap(size);
+    {
+        ptr = malloc_mmap(size, NULL);
+    }
     return ptr;
 }
 

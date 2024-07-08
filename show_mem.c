@@ -43,8 +43,6 @@ static void print_start_addr(char *str, char* start)
     write(1, "\n", 1);
 }
 
-
-
 static int calc_prealloc_small()
 {
     char *ptr = memory_pool + sizeof(size_t);

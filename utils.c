@@ -17,15 +17,19 @@ int round_up_align(size_t size, int align_to)
     return size + align_to - remainder;
 }
 
-int calc_free_area(char *start, char *end)
+int calc_free_area(char *start, char *end, char *curr_chunk)
 {
     char *start_ptr = start;
 
+    if (start_ptr == curr_chunk)
+        start_ptr += GET_CHUNK_SIZE(start_ptr);
     while (start_ptr < end && GET_CHUNK_SIZE(start_ptr) == -1)
     {
         while (start_ptr < end && *start_ptr == '\0')
             start_ptr++;
         start_ptr += sizeof(size_t);
+        if (start_ptr == curr_chunk)
+            start_ptr += GET_CHUNK_SIZE(start_ptr);
     }
     return start_ptr - start;
 }
@@ -54,7 +58,7 @@ char* find_start(char* to_find)
     return NULL;
 }
 
-void* find_chunk(char* start, char* end, size_t size_needed)
+void* find_chunk(char* start, char* end, size_t size_needed, char* curr_alloc)
 {
     int size;
 
@@ -66,7 +70,7 @@ void* find_chunk(char* start, char* end, size_t size_needed)
         if (size == -1)
         {
             int chunk_size;
-            chunk_size = calc_free_area(start, end);
+            chunk_size = calc_free_area(start, end, curr_alloc);
             if (chunk_size >= (int)size_needed)
             {
                 SET_CHUNK_SIZE(start, size_needed);

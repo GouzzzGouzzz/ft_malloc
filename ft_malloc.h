@@ -3,7 +3,6 @@
 # include <sys/mman.h>
 # include <sys/resource.h>
 # include "./libft/libft.h"
-# include <stdio.h>
 
 //Various value to simplify memory access for my array / ptr
 # define ZERO_SIZE_BLOCK 16
@@ -34,16 +33,17 @@
 extern char memory_pool[SIZE_MAX_POOL + ZERO_SIZE_BLOCK + sizeof(void *)];
 
 //Main functions
-void    my_free(void *ptr);
-void    *my_malloc(size_t size);
+void    free(void *ptr);
+void    *malloc(size_t size);
 void    *realloc(void *ptr, size_t size);
 void    show_alloc_mem();
 
 //Utils
 void    init_malloc();
 int     round_up_align(size_t size, int align_to);
-int     calc_free_area(char *start, char *end);
+int     calc_free_area(char *start, char *end, char *curr_chunk);
 char*   find_start(char* to_find);
-void* find_chunk(char* start, char* end, size_t size_needed);
+void*   find_chunk(char* start, char* end, size_t size_needed, char* curr_alloc);
+void*   malloc_mmap(size_t size_needed, char *curr_alloc);
 
 #endif

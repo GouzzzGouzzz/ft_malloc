@@ -37,7 +37,7 @@ static void unmap_link(char* ptr, size_t size)
     return ;
 }
 
-void my_free(void *ptr)
+void free(void *ptr)
 {
     int size;
 
@@ -60,7 +60,7 @@ void my_free(void *ptr)
         if (!start_alloc)
             return ;
         area_size = GET_ALLOC_SIZE(start_alloc);
-        if (calc_free_area(start_alloc + START_MMAP_ALLOC, start_alloc + area_size) == (area_size - START_MMAP_ALLOC + sizeof(size_t)))
+        if (calc_free_area(start_alloc + START_MMAP_ALLOC, start_alloc + area_size, NULL) == (int)(area_size - START_MMAP_ALLOC + sizeof(size_t)))
             unmap_link(start_alloc, area_size);
     }
 }

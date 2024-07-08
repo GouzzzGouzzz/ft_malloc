@@ -1,5 +1,4 @@
-#include "ft_malloc.h"
-
+#include <stdlib.h>
 
 int	main()
 {
@@ -7,7 +6,7 @@ int	main()
 	char *addr;
 
 	i = 0;
-	while (i < 4)
+	while (i < 1024)
 	{
 		addr = (char*)malloc(1024);
 		addr[0] = 42;
