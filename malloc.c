@@ -1,11 +1,13 @@
 #include "ft_malloc.h"
 
-char memory_pool[SIZE_MAX_POOL + ZERO_SIZE_BLOCK + sizeof(void *)];
+char memory_pool[SIZE_MAX_POOL + ZERO_SIZE_BLOCK + sizeof(void *)]  = {0};
 
 static char* new_mmap_alloc(int size_to_map, int size_needed)
 {
     void *ptr;
-
+    ft_putstr_fd("ALLOCATIN :", 1);
+    ft_putnbr_fd(size_to_map, 1);
+    write(1, "\n", 1);
     ptr = mmap(NULL, size_to_map, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
     if (ptr == MAP_FAILED)
         return NULL;
@@ -13,7 +15,6 @@ static char* new_mmap_alloc(int size_to_map, int size_needed)
     SET_ALLOC_SIZE(ptr, size_to_map);
     if (ptr + START_MMAP_ALLOC + size_needed < ptr + size_to_map)
         SET_CHUNK_FREE(ptr + START_MMAP_ALLOC + size_needed + sizeof(size_t));
-    printf("mmap at : %p\n", ptr);
     return ptr;
 }
 
@@ -21,16 +22,13 @@ static char* init_mmap(int size_to_map, int size_needed)
 {
     void *ptr;
 
-    ft_putstr_fd("FIRST MMAP\n",1);
     ptr = new_mmap_alloc(size_to_map, size_needed);
     if (ptr == NULL)
         return NULL;
-    *(void **)(char *)(memory_pool + START_LARGE) = (void *)ptr;
-    char * curr_ptr = *(void **)(char *)(memory_pool + START_LARGE);
-    printf("STOCKED : %p\n", curr_ptr + START_LARGE);
+    *(void **)(memory_pool + START_LARGE) = ptr;
     SET_PREV_ADRR(ptr, NULL);
     SET_NEXT_ADDR(ptr, NULL);
-    return ptr + START_MMAP_ALLOC;
+    return (ptr + START_MMAP_ALLOC);
 }
 
 static char* add_mmap_alloc(int size_to_map, int size_needed, char *curr_ptr)
@@ -49,14 +47,13 @@ static char* add_mmap_alloc(int size_to_map, int size_needed, char *curr_ptr)
 void* malloc_mmap(size_t size_needed, char *curr_alloc)
 {
     void* ptr = NULL;
-    char *curr_ptr;
+    char *curr_ptr = NULL;
     char *end_ptr;
     int size_to_map;
 
     size_needed = round_up_align(size_needed, sizeof(size_t));
     size_to_map = round_up_align(size_needed + START_MMAP_ALLOC, sysconf(_SC_PAGESIZE));
-    curr_ptr = (char *)(void*)(memory_pool + START_LARGE);
-    printf("in mem : %p\n", curr_ptr);
+    curr_ptr = *(void**)(memory_pool + START_LARGE);
     if (!curr_ptr)
     {
         return init_mmap(size_to_map, size_needed);
@@ -86,7 +83,7 @@ static void* malloc_prealloc(char *start, char *end, size_t size)
     return ptr;
 }
 
-void *my_malloc(size_t size)
+void *malloc(size_t size)
 {
     char *ptr = NULL;
 

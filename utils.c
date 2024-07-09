@@ -1,8 +1,6 @@
 #include "ft_malloc.h"
-
 void init_malloc()
 {
-    ft_bzero(memory_pool, SIZE_MAX_POOL + ZERO_SIZE_BLOCK + sizeof(void *));
     SET_CHUNK_FREE(memory_pool + sizeof(size_t));
     SET_CHUNK_FREE(memory_pool + sizeof(size_t) + SIZE_SMALL_POOL);
 }

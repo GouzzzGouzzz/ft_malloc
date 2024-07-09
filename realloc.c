@@ -21,7 +21,7 @@ static char *move_alloc_to(char* start, char* end, size_t size_needed, char* cur
 	if (!new_ptr)
 		return NULL;
 	ft_memcpy(new_ptr, curr_alloc, GET_CHUNK_SIZE(curr_alloc));
-	my_free(curr_alloc);
+	free(curr_alloc);
 	return new_ptr;
 }
 
@@ -33,7 +33,7 @@ static char *move_alloc_mmap(size_t size, char* curr_alloc)
     if (!new_ptr)
         return NULL;
     ft_memcpy(new_ptr, curr_alloc, GET_CHUNK_SIZE(curr_alloc));
-	my_free(curr_alloc);
+	free(curr_alloc);
 	return new_ptr;
 }
 
@@ -42,10 +42,10 @@ void *realloc(void *ptr, size_t size)
     if (GET_CHUNK_SIZE(memory_pool + sizeof(size_t)) == 0)
         init_malloc();
     if (!ptr)
-        return my_malloc(size);
+        return malloc(size);
     if (ptr && size == 0)
     {
-        my_free(ptr);
+        free(ptr);
         return NULL;
     }
 	size = round_up_align(size, sizeof(size_t));
