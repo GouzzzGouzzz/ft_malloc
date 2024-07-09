@@ -65,9 +65,12 @@ void free(void *ptr)
         start_alloc = find_start(ptr);
         if (!start_alloc)
             return ;
+        //check number of chunk if 0 then unmap link
         area_size = GET_ALLOC_SIZE(start_alloc);
-        ft_putnbr_fd(area_size, 1);
-        if (calc_free_area(start_alloc + START_MMAP_ALLOC, start_alloc + area_size, NULL) == (int)(area_size - START_MMAP_ALLOC + sizeof(size_t)))
+        if (GET_CHUNK_NUMBER(ptr) == 0)
             unmap_link(start_alloc, area_size);
+        ft_putnbr_fd(area_size, 1);
+        // if (calc_free_area(start_alloc + START_MMAP_ALLOC, start_alloc + area_size, NULL) == (int)(area_size - START_MMAP_ALLOC + sizeof(size_t)))
+        //     unmap_link(start_alloc, area_size);
     }
 }
