@@ -45,11 +45,11 @@ void free(void *ptr)
 {
     int size;
 
-
-    if (GET_CHUNK_SIZE(memory_pool + sizeof(size_t)) == 0)
-        init_malloc();
     if (ptr == NULL || ptr == memory_pool + SIZE_MAX_POOL)
         return ;
+    pthread_mutex_lock(&alloc_acces);
+    if (GET_CHUNK_SIZE(memory_pool + sizeof(size_t)) == 0)
+        init_malloc();
     size = GET_CHUNK_SIZE(ptr);
     SET_CHUNK_FREE(ptr);
     if ((char *)ptr >= memory_pool && (char *)ptr <= memory_pool + SIZE_MAX_POOL)
@@ -64,13 +64,24 @@ void free(void *ptr)
 
         start_alloc = find_start(ptr);
         if (!start_alloc)
+        {
+            pthread_mutex_unlock(&alloc_acces);
             return ;
-        //check number of chunk if 0 then unmap link
+        }
+
         area_size = GET_ALLOC_SIZE(start_alloc);
-        if (GET_CHUNK_NUMBER(ptr) == 0)
+        //if this ptr is the last in the area, free it
+        ft_putstr_fd("NB ALLOC: ", 1);
+        ft_putnbr_fd(GET_ALLOC_NUMBER(start_alloc), 1);
+        write(1, "\n", 1);
+        if (GET_ALLOC_NUMBER(start_alloc) == 1)
             unmap_link(start_alloc, area_size);
-        ft_putnbr_fd(area_size, 1);
-        // if (calc_free_area(start_alloc + START_MMAP_ALLOC, start_alloc + area_size, NULL) == (int)(area_size - START_MMAP_ALLOC + sizeof(size_t)))
-        //     unmap_link(start_alloc, area_size);
+        else
+        {
+            SET_ALLOC_NUMBER(start_alloc, GET_ALLOC_NUMBER(start_alloc) - 1);
+            for (int i = 0; i < size; i++)
+                ((char *)ptr)[i] = '\0';
+        }
     }
+    pthread_mutex_unlock(&alloc_acces);
 }

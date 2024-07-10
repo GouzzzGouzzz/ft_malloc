@@ -15,8 +15,6 @@ int round_up_align(size_t size, int align_to)
     return size + align_to - remainder;
 }
 
-//instead of doing this
-//add a metadata nb_of_chunk, if it is to zero --> munmap, else do nothing
 int calc_free_area(char *start, char *end, char *curr_chunk)
 {
     char *start_ptr = start;

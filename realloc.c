@@ -39,35 +39,41 @@ static char *move_alloc_mmap(size_t size, char* curr_alloc)
 
 void *realloc(void *ptr, size_t size)
 {
-    if (GET_CHUNK_SIZE(memory_pool + sizeof(size_t)) == 0)
-        init_malloc();
     if (!ptr)
         return malloc(size);
+    pthread_mutex_lock(&alloc_acces);
+    if (GET_CHUNK_SIZE(memory_pool + sizeof(size_t)) == 0)
+        init_malloc();
     if (ptr && size == 0)
     {
         free(ptr);
+        pthread_mutex_unlock(&alloc_acces);
         return NULL;
     }
 	size = round_up_align(size, sizeof(size_t));
     size_t curr_size = GET_CHUNK_SIZE(ptr);
 	if (curr_size == size)
+    {
+        pthread_mutex_unlock(&alloc_acces);
 		return ptr;
-
+    }
 	if (size > curr_size) // need extend
 	{
+        void *ptr = NULL;
+
 		if (size < SMALL_VALUE)
-			return move_alloc_to(memory_pool, memory_pool + SIZE_SMALL_POOL, size, ptr);
+			ptr = move_alloc_to(memory_pool, memory_pool + SIZE_SMALL_POOL, size, ptr);
 		else if (size < MEDIUM_VALUE)
-			return move_alloc_to(memory_pool + SIZE_SMALL_POOL, memory_pool + SIZE_MAX_POOL, size, ptr);
+			ptr =  move_alloc_to(memory_pool + SIZE_SMALL_POOL, memory_pool + SIZE_MAX_POOL, size, ptr);
 		else
-            return move_alloc_mmap(size, ptr);
-	}
-    else
-    {
-        for (size_t i = 0; i < GET_CHUNK_SIZE(ptr) - size - sizeof(size_t); i++)
-	        ((char *)(ptr + size + sizeof(size_t)))[i] = '\0';
-        SET_CHUNK_SIZE(ptr, size);
-        SET_CHUNK_FREE(ptr + size + sizeof(size_t));
+            ptr =  move_alloc_mmap(size, ptr);
+        pthread_mutex_unlock(&alloc_acces);
         return ptr;
-    }
+	}
+    for (size_t i = 0; i < GET_CHUNK_SIZE(ptr) - size - sizeof(size_t); i++)
+        ((char *)(ptr + size + sizeof(size_t)))[i] = '\0';
+    SET_CHUNK_SIZE(ptr, size);
+    SET_CHUNK_FREE(ptr + size + sizeof(size_t));
+    pthread_mutex_unlock(&alloc_acces);
+    return ptr;
 }

@@ -144,6 +144,7 @@ void show_alloc_mem()
 {
     int small_total, medium_total, large_total = 0;
 
+    pthread_mutex_lock(&alloc_acces);
     if (GET_CHUNK_SIZE(memory_pool + sizeof(size_t)) == 0)
         init_malloc();
     small_total = calc_prealloc_small();
@@ -156,4 +157,5 @@ void show_alloc_mem()
     if (large_total == 0)
         write(1, "None\n",6);
     print_bytes("Total : ", small_total + medium_total + large_total);
+    pthread_mutex_unlock(&alloc_acces);
 }

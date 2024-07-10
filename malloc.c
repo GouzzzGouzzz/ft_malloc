@@ -13,6 +13,7 @@ static char* new_mmap_alloc(int size_to_map, int size_needed)
         return NULL;
     SET_CHUNK_SIZE(ptr + START_MMAP_ALLOC, size_needed);
     SET_ALLOC_SIZE(ptr, size_to_map);
+    SET_ALLOC_NUMBER(ptr, 1);
     if (ptr + START_MMAP_ALLOC + size_needed < ptr + size_to_map)
         SET_CHUNK_FREE(ptr + START_MMAP_ALLOC + size_needed + sizeof(size_t));
     return ptr;
@@ -21,7 +22,7 @@ static char* new_mmap_alloc(int size_to_map, int size_needed)
 static char* init_mmap(int size_to_map, int size_needed)
 {
     void *ptr;
-
+    ft_putstr_fd("FIRST\n",1);
     ptr = new_mmap_alloc(size_to_map, size_needed);
     if (ptr == NULL)
         return NULL;
@@ -63,9 +64,12 @@ void* malloc_mmap(size_t size_needed, char *curr_alloc)
         while (curr_ptr != NULL)
         {
             end_ptr = (curr_ptr + GET_ALLOC_SIZE(curr_ptr));
-            ptr = find_chunk(curr_ptr + sizeof(size_t) + (2 * sizeof(void *)), end_ptr, size_needed, curr_alloc);
+            ptr = find_chunk(curr_ptr + (2 * sizeof(size_t)) + (2 * sizeof(void *)), end_ptr, size_needed, curr_alloc);
             if (ptr != NULL)
+            {
+                SET_ALLOC_NUMBER(curr_ptr, GET_ALLOC_NUMBER(curr_ptr) + 1);
                 return ptr;
+            }
             if (!*(void**)(curr_ptr))
                 break;
             curr_ptr = *(void**)(curr_ptr);
@@ -87,18 +91,20 @@ void *malloc(size_t size)
 {
     char *ptr = NULL;
 
-    if (GET_CHUNK_SIZE(memory_pool + sizeof(size_t)) == 0)
-        init_malloc();
     if (size == 0)
         return memory_pool + SIZE_MAX_POOL;
-    if (size > 9223372036854775807)
+    if (size > 9223372036854775807 || size < 0)
         return NULL;
+    pthread_mutex_lock(&alloc_acces);
+    if (GET_CHUNK_SIZE(memory_pool + sizeof(size_t)) == 0)
+        init_malloc();
     if (size <= SMALL_VALUE)
         ptr = malloc_prealloc(memory_pool, memory_pool + SIZE_SMALL_POOL, size);
     else if (size <= MEDIUM_VALUE)
         ptr = malloc_prealloc(memory_pool + SIZE_SMALL_POOL, memory_pool + SIZE_MAX_POOL, size);
     else
         ptr = malloc_mmap(size, NULL);
+    pthread_mutex_unlock(&alloc_acces);
     return ptr;
 }
 
