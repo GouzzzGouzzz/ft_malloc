@@ -3,5 +3,3 @@
 *.a
 .vscode
 a.out
-test.c
-ft_malloc_test/
