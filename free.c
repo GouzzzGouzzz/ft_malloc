@@ -1,11 +1,11 @@
 #include "ft_malloc.h"
 
-static void unmap_link(void* ptr, size_t size)
+static void unlink_area(void* ptr, size_t size)
 {
     char *prev;
     char *next;
 
-    next = *(void**)(ptr);
+    next = *(void**)ptr;
     prev = *(void**)(ptr + sizeof(void *));
     if (!prev) //first mmap called
     {
@@ -44,7 +44,7 @@ void free(void *ptr)
     if (ptr == NULL || (((char*)ptr < memory_pool || (char*)ptr > memory_pool + SIZE_MAX_POOL) && !find_start(ptr)))
         return ;
     pthread_mutex_lock(&alloc_acces);
-    if (GET_CHUNK_SIZE(memory_pool + sizeof(size_t)) == 0)
+    if (GET_CHUNK_SIZE(memory_pool + ALIGNMENT) == 0)
         init_malloc();
     size = GET_CHUNK_SIZE(ptr);
     SET_CHUNK_FREE(ptr);
@@ -57,6 +57,7 @@ void free(void *ptr)
     {
         size_t area_size;
         char *start_alloc;
+
         start_alloc = find_start(ptr);
         if (!start_alloc)
         {
@@ -64,8 +65,8 @@ void free(void *ptr)
             return ;
         }
         area_size = GET_ALLOC_SIZE(start_alloc);
-        if (GET_ALLOC_NUMBER(start_alloc) == 1)
-            unmap_link(&start_alloc, area_size);
+        if (GET_ALLOC_NUMBER(start_alloc) == 1 && *(void**)start_alloc != NULL)
+            unlink_area(start_alloc, area_size);
         else
         {
             SET_ALLOC_NUMBER(start_alloc, GET_ALLOC_NUMBER(start_alloc) - 1);

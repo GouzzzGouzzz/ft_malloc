@@ -6,16 +6,17 @@
 # include <pthread.h>
 
 //Various value to simplify memory access for my array / ptr
-# define ZERO_SIZE_BLOCK 16
 # define SMALL_VALUE 64
 # define MEDIUM_VALUE 256
 # define SIZE_SMALL_POOL 8192
 # define SIZE_MEDIUM_POOL 28672
 # define SIZE_MAX_POOL SIZE_SMALL_POOL + SIZE_MEDIUM_POOL
-# define START_LARGE SIZE_MAX_POOL + ZERO_SIZE_BLOCK
+# define START_LARGE SIZE_MAX_POOL
+# define ALIGNMENT (2 * sizeof(size_t))
 
 //2 size_t for the allocated size, and the first chunk size, 2 void * for the prev and next allocated address
-# define START_MMAP_ALLOC ((3 * sizeof(size_t)) + (2 * sizeof(void *)))
+//1 more size_t to be aligned in 16 bytes (so there is 48 bytes of metadata, only 40 are used)
+# define START_MMAP_ALLOC ((4 * sizeof(size_t)) + (2 * sizeof(void *)))
 
 //Macro
 //Setter and getter for the chunk allocations
@@ -44,10 +45,9 @@ void    show_alloc_mem();
 //Utils
 void    init_malloc();
 int     round_up_align(size_t size, int align_to);
-int     calc_free_area(char *start, char *end, char *curr_chunk);
+int     calc_free_area(char *start, char *end);
 char*   find_start(char* to_find);
-void*   find_chunk(char* start, char* end, size_t size_needed, char* curr_alloc);
-void*   malloc_mmap(size_t size_needed, char *curr_alloc);
-int     get_mmap_threshold(int size);
+void*   find_chunk(char* start, char* end, size_t size_needed);
+void*   malloc_mmap(size_t size_needed);
 
 #endif

@@ -1,8 +1,9 @@
 #include "ft_malloc.h"
+
 void init_malloc()
 {
-    SET_CHUNK_FREE(memory_pool + sizeof(size_t));
-    SET_CHUNK_FREE(memory_pool + sizeof(size_t) + SIZE_SMALL_POOL);
+    SET_CHUNK_FREE(memory_pool + ALIGNMENT);
+    SET_CHUNK_FREE(memory_pool + ALIGNMENT + SIZE_SMALL_POOL);
 }
 
 int round_up_align(size_t size, int align_to)
@@ -15,19 +16,15 @@ int round_up_align(size_t size, int align_to)
     return size + align_to - remainder;
 }
 
-int calc_free_area(char *start, char *end, char *curr_chunk)
+int calc_free_area(char *start, char *end)
 {
     char *start_ptr = start;
 
-    if (start_ptr == curr_chunk)
-        start_ptr += GET_CHUNK_SIZE(start_ptr);
     while (start_ptr < end && GET_CHUNK_SIZE(start_ptr) == -1)
     {
         while (start_ptr < end && *start_ptr == '\0')
             start_ptr++;
-        start_ptr += sizeof(size_t);
-        if (start_ptr == curr_chunk)
-            start_ptr += GET_CHUNK_SIZE(start_ptr);
+        start_ptr += ALIGNMENT;
     }
     return start_ptr - start;
 }
@@ -56,30 +53,33 @@ char* find_start(char* to_find)
     return NULL;
 }
 
-void* find_chunk(char* start, char* end, size_t size_needed, char* curr_alloc)
+void* find_chunk(char* start, char* end, size_t size_needed)
 {
     int size;
 
-    size_needed = round_up_align(size_needed, sizeof(size_t));
-    start += sizeof(size_t);
+    size_needed = round_up_align(size_needed, ALIGNMENT);
+    start += ALIGNMENT;
     while (start < end)
     {
         size = GET_CHUNK_SIZE(start);
         if (size == -1)
         {
-            int chunk_size;
-            chunk_size = calc_free_area(start, end, curr_alloc);
-            if (chunk_size >= (int)size_needed)
+            size_t chunk_size;
+            chunk_size = calc_free_area(start, end);
+            if (chunk_size >= size_needed)
             {
                 SET_CHUNK_SIZE(start, size_needed);
-                if (start + size_needed + sizeof(size_t) < end && GET_CHUNK_SIZE(start + size_needed + sizeof(size_t)) == 0)
-                    SET_CHUNK_FREE(start + size_needed + sizeof(size_t));
+                if (start + size_needed + ALIGNMENT < end && GET_CHUNK_SIZE(start + size_needed + ALIGNMENT) == 0)
+                    SET_CHUNK_FREE(start + size_needed + ALIGNMENT);
+                ft_putstr_fd("ALLOCATED : ", 1);
+                ft_putnbr_fd(size_needed + ALIGNMENT, 1);
+                write(1, "\n", 1);
                 return start;
             }
             start += chunk_size;
         }
         else
-            start += size + sizeof(size_t);
+            start += size + ALIGNMENT;
     }
     return NULL;
 }
