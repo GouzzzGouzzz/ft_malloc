@@ -1,6 +1,7 @@
 #include "ft_malloc.h"
 
-char memory_pool[SIZE_MAX_POOL + ZERO_SIZE_BLOCK + sizeof(void *)]  = {0};
+char memory_pool[SIZE_MAX_POOL + sizeof(void *)]  = {0};
+pthread_mutex_t	alloc_acces;
 
 static char* new_mmap_alloc(int size_to_map, int size_needed)
 {
@@ -91,9 +92,7 @@ void *malloc(size_t size)
 {
     char *ptr = NULL;
 
-    if (size == 0)
-        return memory_pool + SIZE_MAX_POOL;
-    if (size > 9223372036854775807 || size < 0)
+    if (size > 9223372036854775807 || size <= 0)
         return NULL;
     pthread_mutex_lock(&alloc_acces);
     if (GET_CHUNK_SIZE(memory_pool + sizeof(size_t)) == 0)

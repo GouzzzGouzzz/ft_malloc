@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 
 int	main()
 {
@@ -10,7 +11,7 @@ int	main()
     {
         addr = (char *)malloc(1024);
         addr[0] = 42;
-        free(addr);
+        // free(addr);
         i++;
     }
     return 0;

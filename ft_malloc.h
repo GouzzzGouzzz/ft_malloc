@@ -31,14 +31,11 @@
 # define GET_ALLOC_NUMBER(ptr) (*(int *)((char *)(ptr) + (2 * sizeof(void *) + sizeof(size_t))))
 
 //Global var to manage all allocations from my malloc
-//ZERO_SIZE_BLOCK for the malloc(0) case
 //void * at the end pointing to the first mmap alloc (default : NULL)
-extern char memory_pool[SIZE_MAX_POOL + ZERO_SIZE_BLOCK + sizeof(void *)];
+extern char memory_pool[SIZE_MAX_POOL + sizeof(void *)];
 extern pthread_mutex_t	alloc_acces;
 
 //Main functions
-// void    free(void *ptr);
-// void    *malloc(size_t size);
 void    free(void *ptr);
 void    *malloc(size_t size);
 void    *realloc(void *ptr, size_t size);
