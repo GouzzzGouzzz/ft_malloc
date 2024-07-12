@@ -22,9 +22,11 @@ static char *move_alloc_to(char* start, char* end, size_t size_needed, char* cur
     new_ptr = inplace_extend(curr_alloc + GET_CHUNK_SIZE(curr_alloc) + ALIGNMENT, end, size_needed, curr_alloc);
     if (new_ptr != NULL)
         return new_ptr;
+    pthread_mutex_unlock(&alloc_acces);
     new_ptr = malloc(size_needed);
     if (!new_ptr)
         return NULL;
+    pthread_mutex_lock(&alloc_acces);
     ft_memcpy(new_ptr, curr_alloc, GET_CHUNK_SIZE(curr_alloc));
     pthread_mutex_unlock(&alloc_acces);
     free(curr_alloc);
@@ -42,16 +44,16 @@ static char *move_alloc_mmap(size_t size, char* curr_alloc)
     new_ptr = inplace_extend(curr_alloc + GET_CHUNK_SIZE(curr_alloc) + ALIGNMENT, end, size, curr_alloc);
     if (new_ptr != NULL)
         return new_ptr;
-    else
-    {
-        new_ptr = malloc(size);
-        if (!new_ptr)
-            return NULL;
-        ft_memcpy(new_ptr, curr_alloc, GET_CHUNK_SIZE(curr_alloc));
-        pthread_mutex_unlock(&alloc_acces);
-        free(curr_alloc);
-        return new_ptr;
-    }
+    pthread_mutex_unlock(&alloc_acces);
+    new_ptr = malloc(size);
+    if (!new_ptr)
+        return NULL;
+    pthread_mutex_lock(&alloc_acces);
+    ft_memcpy(new_ptr, curr_alloc, GET_CHUNK_SIZE(curr_alloc));
+    pthread_mutex_unlock(&alloc_acces);
+    free(curr_alloc);
+    return new_ptr;
+
 }
 
 static void shrink(size_t size, size_t curr_size, void *ptr)
@@ -67,7 +69,6 @@ static void shrink(size_t size, size_t curr_size, void *ptr)
 static void* extend(size_t size, void *ptr)
 {
     void *ret_ptr = NULL;
-
     if (size < SMALL_VALUE)
         ret_ptr = move_alloc_to(memory_pool, memory_pool + SIZE_SMALL_POOL, size, ptr);
     else if (size < MEDIUM_VALUE)
@@ -89,6 +90,7 @@ void *realloc(void *ptr, size_t size)
     if (size > 9223372036854775807)
         return NULL;
     pthread_mutex_lock(&alloc_acces);
+
     if (GET_CHUNK_SIZE(memory_pool + ALIGNMENT) == 0)
         init_malloc();
 

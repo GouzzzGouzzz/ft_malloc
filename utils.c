@@ -71,9 +71,6 @@ void* find_chunk(char* start, char* end, size_t size_needed)
                 SET_CHUNK_SIZE(start, size_needed);
                 if (start + size_needed + ALIGNMENT < end && GET_CHUNK_SIZE(start + size_needed + ALIGNMENT) == 0)
                     SET_CHUNK_FREE(start + size_needed + ALIGNMENT);
-                ft_putstr_fd("ALLOCATED : ", 1);
-                ft_putnbr_fd(size_needed + ALIGNMENT, 1);
-                write(1, "\n", 1);
                 return start;
             }
             start += chunk_size;
