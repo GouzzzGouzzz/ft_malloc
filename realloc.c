@@ -2,7 +2,7 @@
 
 static void* inplace_extend(char* start, char*end, size_t size, char* ptr)
 {
-    int expandable_size;
+    size_t expandable_size;
 
     expandable_size = calc_free_area(start, end);
     if (expandable_size + GET_CHUNK_SIZE(ptr) >= size)
@@ -15,7 +15,7 @@ static void* inplace_extend(char* start, char*end, size_t size, char* ptr)
     return NULL;
 }
 
-static char *move_alloc_to(char* start, char* end, size_t size_needed, char* curr_alloc)
+static char *move_alloc_to(char* end, size_t size_needed, char* curr_alloc)
 {
 	char* new_ptr;
 
@@ -70,9 +70,9 @@ static void* extend(size_t size, void *ptr)
 {
     void *ret_ptr = NULL;
     if (size < SMALL_VALUE)
-        ret_ptr = move_alloc_to(memory_pool, memory_pool + SIZE_SMALL_POOL, size, ptr);
+        ret_ptr = move_alloc_to(memory_pool + SIZE_SMALL_POOL, size, ptr);
     else if (size < MEDIUM_VALUE)
-        ret_ptr =  move_alloc_to(memory_pool + SIZE_SMALL_POOL, memory_pool + SIZE_MAX_POOL, size, ptr);
+        ret_ptr =  move_alloc_to(memory_pool + SIZE_MAX_POOL, size, ptr);
     else
         ret_ptr =  move_alloc_mmap(size, ptr);
     return ret_ptr;
@@ -96,7 +96,9 @@ void *realloc(void *ptr, size_t size)
     }
     pthread_mutex_lock(&alloc_acces);
     if (GET_CHUNK_SIZE(memory_pool + ALIGNMENT) == 0)
+    {
         init_malloc();
+    }
 	size = round_up_align(size, ALIGNMENT);
     size_t curr_size = GET_CHUNK_SIZE(ptr);
 	if (curr_size == size)
