@@ -80,21 +80,23 @@ static void* extend(size_t size, void *ptr)
 
 void *realloc(void *ptr, size_t size)
 {
-    if (!ptr || (((char*)ptr < memory_pool || (char*)ptr > memory_pool + SIZE_MAX_POOL) && !find_start(ptr)))
+    if (!ptr)
         return malloc(size);
+    if (!find_start(ptr) || (((char*)ptr < memory_pool && (char*)ptr > memory_pool + SIZE_MAX_POOL)))
+    {
+        write(1, "realloc(): invalid pointer\n", 28);
+        return NULL;
+    }
+    if (size > 9223372036854775807)
+        return NULL;
     if (ptr && size == 0)
     {
         free(ptr);
         return NULL;
     }
-    if (size > 9223372036854775807)
-        return NULL;
     pthread_mutex_lock(&alloc_acces);
-
     if (GET_CHUNK_SIZE(memory_pool + ALIGNMENT) == 0)
         init_malloc();
-
-    //All test passed
 	size = round_up_align(size, ALIGNMENT);
     size_t curr_size = GET_CHUNK_SIZE(ptr);
 	if (curr_size == size)

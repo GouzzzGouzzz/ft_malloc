@@ -42,7 +42,10 @@ void free(void *ptr)
     int size;
 
     if (ptr == NULL || (((char*)ptr < memory_pool || (char*)ptr > memory_pool + SIZE_MAX_POOL) && !find_start(ptr)))
+    {
+        write(1, "free(): invalid pointer\n", 25);
         return ;
+    }
     pthread_mutex_lock(&alloc_acces);
     if (GET_CHUNK_SIZE(memory_pool + ALIGNMENT) == 0)
         init_malloc();
