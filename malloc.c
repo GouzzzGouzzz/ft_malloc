@@ -82,7 +82,7 @@ static void* malloc_prealloc(char *start, char *end, size_t size)
     char *ptr = find_chunk(start, end, size);
 
     if (ptr == NULL)
-        ptr = malloc_mmap(size);
+        return NULL;
     return ptr;
 }
 

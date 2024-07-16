@@ -4,5 +4,6 @@ int main()
 {
     char *addr;
 
-    realloc(addr, 11);
+    addr = NULL;
+    addr = realloc(addr, 11);
 }
