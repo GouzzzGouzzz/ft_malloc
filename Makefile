@@ -32,7 +32,7 @@ $(SYMLINK_NAME): $(NAME)
 
 $(NAME): $(OBJ)
 	$(MAKE) -C ./libft/ all
-	$(CC) $(CFLAGS) -shared -o $(NAME) $(OBJ)
+	$(CC) $(CFLAGS) -shared -o $(NAME) $(OBJ) ./libft/obj/*
 
 clean:
 	$(MAKE) -C ./libft/ clean
