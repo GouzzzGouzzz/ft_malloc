@@ -39,75 +39,19 @@ static void print_addr_diff(char *ptr, int size)
 static void print_start_addr(char *str, char* start)
 {
     ft_putstr_fd(str, 1);
-    print_address((unsigned long)start);
+    if (!start)
+        write(1, "NULL", 4);
+    else
+        print_address((unsigned long)start);
     write(1, "\n", 1);
 }
 
-static size_t calc_prealloc_small()
+static size_t calc_mmap_alloc(char *ptr)
 {
-    char *ptr = memory_pool + ALIGNMENT;
-    size_t total = 0;
-
-    print_start_addr("SMALL  : ", memory_pool);
-    while (ptr < memory_pool + SIZE_SMALL_POOL)
-    {
-        int size = GET_CHUNK_SIZE(ptr);
-        if (size <= -1) //Skipping freed chunk
-        {
-            while (*ptr == '\0')
-            {
-                ptr++;
-                if (ptr + ALIGNMENT == memory_pool + SIZE_SMALL_POOL)
-                    return total;
-            }
-            ptr += ALIGNMENT;
-            continue ;
-        }
-        total += size;
-        print_addr_diff(ptr, size);
-        ptr += ALIGNMENT + size;
-        print_bytes(" : ", size);
-    }
-    return total;
-}
-
-static size_t calc_prealloc_medium()
-{
-    char *ptr = memory_pool + ALIGNMENT + SIZE_SMALL_POOL;
-    size_t total = 0;
-
-    print_start_addr("MEDIUM : ", memory_pool + SIZE_SMALL_POOL);
-    while (ptr < memory_pool + SIZE_MAX_POOL)
-    {
-        int size = GET_CHUNK_SIZE(ptr);
-        if (size <= -1) //Skipping freed chunk
-        {
-            while (*ptr == '\0')
-            {
-                ptr++;
-                if (ptr + ALIGNMENT == memory_pool + SIZE_MAX_POOL)
-                    return total;
-            }
-            ptr += ALIGNMENT;
-            continue ;
-        }
-        total += size;
-        print_addr_diff(ptr, size);
-        ptr += ALIGNMENT + size;
-        print_bytes(" : ", size);
-    }
-    return total;
-}
-
-static size_t calc_mmap_alloc()
-{
-    char *ptr;
     size_t total = 0;
     char *next_ptr;
     char *end_ptr;
 
-    ptr = *(void**)(memory_pool + START_LARGE);
-    print_start_addr("LARGE  : ", ptr);
     if (!ptr)
         return 0;
     next_ptr = *(void**)(ptr);
@@ -127,7 +71,7 @@ static size_t calc_mmap_alloc()
                 break;
             total += size;
             print_addr_diff(ptr, size);
-            ptr += ALIGNMENT + size;
+            ptr += ALIGNMENT + round_up_align(size, ALIGNMENT);
             print_bytes(" : ", size);
         }
         if (!next_ptr)
@@ -145,17 +89,21 @@ void show_alloc_mem()
     size_t small_total, medium_total, large_total = 0;
 
     pthread_mutex_lock(&alloc_acces);
-    if (GET_CHUNK_SIZE(memory_pool + ALIGNMENT) == 0)
-        init_malloc();
-    small_total = calc_prealloc_small();
+    print_start_addr("SMALL  : ", mem_pool.small);
+    small_total = calc_mmap_alloc(mem_pool.small);
     if (small_total == 0)
         write(1, "None\n",6);
-    medium_total = calc_prealloc_medium();
+
+    print_start_addr("MEDIUM  : ", mem_pool.medium);
+    medium_total = calc_mmap_alloc(mem_pool.medium);
     if (medium_total == 0)
         write(1, "None\n",6);
-    large_total = calc_mmap_alloc();
+
+    print_start_addr("LARGE  : ", mem_pool.large);
+    large_total = calc_mmap_alloc(mem_pool.large);
     if (large_total == 0)
         write(1, "None\n",6);
-    print_bytes("Total (doesn't count metadata) : ", small_total + medium_total + large_total);
+
+    print_bytes("Total : ", small_total + medium_total + large_total);
     pthread_mutex_unlock(&alloc_acces);
 }

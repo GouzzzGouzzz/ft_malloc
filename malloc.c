@@ -1,6 +1,6 @@
 #include "ft_malloc.h"
 
-char memory_pool[SIZE_MAX_POOL + sizeof(void *)]  = {0};
+t_alloc mem_pool;
 pthread_mutex_t	alloc_acces;
 
 static char* new_mmap_alloc(size_t size_to_map, size_t size_needed)
@@ -13,8 +13,8 @@ static char* new_mmap_alloc(size_t size_to_map, size_t size_needed)
     SET_CHUNK_SIZE(ptr + START_MMAP_ALLOC, size_needed);
     SET_ALLOC_SIZE(ptr, size_to_map);
     SET_ALLOC_NUMBER(ptr, 1);
-    if (ptr + START_MMAP_ALLOC + size_needed < ptr + size_to_map)
-        SET_CHUNK_FREE(ptr + START_MMAP_ALLOC + size_needed + ALIGNMENT);
+    if (ptr + START_MMAP_ALLOC + round_up_align(size_needed, ALIGNMENT) < ptr + size_to_map)
+        SET_CHUNK_FREE(ptr + START_MMAP_ALLOC + round_up_align(size_needed, ALIGNMENT) + ALIGNMENT);
     return ptr;
 }
 
@@ -25,16 +25,15 @@ static char* init_mmap(size_t size_to_map, size_t size_needed)
     ptr = new_mmap_alloc(size_to_map, size_needed);
     if (ptr == NULL)
         return NULL;
-    *(void **)(memory_pool + START_LARGE) = ptr;
     SET_PREV_ADRR(ptr, NULL);
     SET_NEXT_ADDR(ptr, NULL);
-    return (ptr + START_MMAP_ALLOC);
+    return ptr + START_MMAP_ALLOC;
 }
 
 static char* add_mmap_alloc(size_t size_to_map, size_t size_needed, char *curr_ptr)
 {
     char *ptr;
-
+    write(1, "MMAP CREATED\n", 14);
     ptr = new_mmap_alloc(size_to_map, size_needed);
     if (ptr == NULL)
         return NULL;
@@ -44,20 +43,15 @@ static char* add_mmap_alloc(size_t size_to_map, size_t size_needed, char *curr_p
     return ptr + START_MMAP_ALLOC;
 }
 
-void* malloc_mmap(size_t size_needed)
+void* malloc_mmap(size_t size_needed, void *curr_ptr)
 {
     void* ptr = NULL;
-    char *curr_ptr = NULL;
     char *end_ptr;
     int size_to_map;
 
-    size_needed = round_up_align(size_needed, ALIGNMENT);
-    size_to_map = round_up_align(size_needed + START_MMAP_ALLOC, sysconf(_SC_PAGESIZE));
-    curr_ptr = *(void**)(memory_pool + START_LARGE);
-    if (!curr_ptr)
-    {
+    size_to_map = round_up_align(size_needed + START_MMAP_ALLOC, 8 * sysconf(_SC_PAGESIZE));
+    if (!curr_ptr) //first large case
         return init_mmap(size_to_map, size_needed);
-    }
     else
     {
         while (curr_ptr != NULL)
@@ -77,30 +71,22 @@ void* malloc_mmap(size_t size_needed)
     }
 }
 
-static void* malloc_prealloc(char *start, char *end, size_t size)
-{
-    char *ptr = find_chunk(start, end, size);
-
-    if (ptr == NULL)
-        return NULL;
-    return ptr;
-}
-
 void *malloc(size_t size)
 {
     char *ptr = NULL;
 
+
     if (size > 9223372036854775807)
         return NULL;
     pthread_mutex_lock(&alloc_acces);
-    if (GET_CHUNK_SIZE(memory_pool + ALIGNMENT) == 0)
+    if (mem_pool.small == NULL) //not initalized
         init_malloc();
     if (size <= SMALL_VALUE)
-        ptr = malloc_prealloc(memory_pool, memory_pool + SIZE_SMALL_POOL, size);
+        ptr = malloc_mmap(size, mem_pool.small);
     else if (size <= MEDIUM_VALUE)
-        ptr = malloc_prealloc(memory_pool + SIZE_SMALL_POOL, memory_pool + SIZE_MAX_POOL, size);
+        ptr = malloc_mmap(size, mem_pool.medium);
     else
-        ptr = malloc_mmap(size);
+        ptr = malloc_mmap(size, mem_pool.large);
     pthread_mutex_unlock(&alloc_acces);
     return ptr;
 }

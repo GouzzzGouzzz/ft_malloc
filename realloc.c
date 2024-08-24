@@ -15,25 +15,7 @@ static void* inplace_extend(char* start, char*end, size_t size, char* ptr)
     return NULL;
 }
 
-static char *move_alloc_to(char* end, size_t size_needed, char* curr_alloc)
-{
-	char* new_ptr;
-
-    new_ptr = inplace_extend(curr_alloc + GET_CHUNK_SIZE(curr_alloc) + ALIGNMENT, end, size_needed, curr_alloc);
-    if (new_ptr != NULL)
-        return new_ptr;
-    pthread_mutex_unlock(&alloc_acces);
-    new_ptr = malloc(size_needed);
-    if (!new_ptr)
-        return NULL;
-    pthread_mutex_lock(&alloc_acces);
-    ft_memcpy(new_ptr, curr_alloc, GET_CHUNK_SIZE(curr_alloc));
-    pthread_mutex_unlock(&alloc_acces);
-    free(curr_alloc);
-    return new_ptr;
-}
-
-static char *move_alloc_mmap(size_t size, char* curr_alloc)
+static char *extend(size_t size, char* curr_alloc)
 {
     char *new_ptr;
     char *start_alloc;
@@ -66,23 +48,11 @@ static void shrink(size_t size, size_t curr_size, void *ptr)
     SET_CHUNK_FREE(ptr + size + ALIGNMENT);
 }
 
-static void* extend(size_t size, void *ptr)
-{
-    void *ret_ptr = NULL;
-    if (size < SMALL_VALUE)
-        ret_ptr = move_alloc_to(memory_pool + SIZE_SMALL_POOL, size, ptr);
-    else if (size < MEDIUM_VALUE)
-        ret_ptr =  move_alloc_to(memory_pool + SIZE_MAX_POOL, size, ptr);
-    else
-        ret_ptr =  move_alloc_mmap(size, ptr);
-    return ret_ptr;
-}
-
 void *realloc(void *ptr, size_t size)
 {
     if (!ptr)
         return malloc(size);
-    if (!find_start(ptr) || (((char*)ptr < memory_pool && (char*)ptr > memory_pool + SIZE_MAX_POOL)))
+    if (!find_start(ptr))
     {
         write(1, "realloc(): invalid pointer\n", 28);
         return NULL;
@@ -95,18 +65,16 @@ void *realloc(void *ptr, size_t size)
         return NULL;
     }
     pthread_mutex_lock(&alloc_acces);
-    if (GET_CHUNK_SIZE(memory_pool + ALIGNMENT) == 0)
-    {
+    if (mem_pool.small == NULL)
         init_malloc();
-    }
-	size = round_up_align(size, ALIGNMENT);
+    size = round_up_align(size, ALIGNMENT);
     size_t curr_size = GET_CHUNK_SIZE(ptr);
-	if (curr_size == size)
+    if (curr_size == size)
     {
         pthread_mutex_unlock(&alloc_acces);
-		return ptr;
+        return ptr;
     }
-	if (size > curr_size)
+    if (size > curr_size)
         return extend(size, ptr);
     shrink(size, curr_size, ptr);
     pthread_mutex_unlock(&alloc_acces);
