@@ -62,10 +62,14 @@ static size_t calc_mmap_alloc(char *ptr)
         while (ptr < end_ptr)
         {
             int size = GET_CHUNK_SIZE(ptr);
+            ft_putstr_fd("Size found :", 1);
+            ft_putnbr_fd(size, 1);
+            write(1,"\n",1);
             if (size == -1)
             {
-                while (ptr < end_ptr && *ptr == '\0')
+                while (ptr < end_ptr && *ptr == '\0'){
                     ptr++;
+                }
             }
             if (ptr == end_ptr)
                 break;
@@ -73,6 +77,9 @@ static size_t calc_mmap_alloc(char *ptr)
             print_addr_diff(ptr, size);
             ptr += ALIGNMENT + round_up_align(size, ALIGNMENT);
             print_bytes(" : ", size);
+            ft_putstr_fd("move :", 1);
+            ft_putnbr_fd(ALIGNMENT + round_up_align(size, ALIGNMENT), 1);
+            ft_putstr_fd("\n", 1);
         }
         if (!next_ptr)
             return total;

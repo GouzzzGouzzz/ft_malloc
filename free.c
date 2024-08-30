@@ -25,7 +25,6 @@ void free(void *ptr)
     int size;
     size_t area_size;
     char *start_alloc;
-
     if (!find_start(ptr))
     {
         write(1, "free(): invalid pointer\n", 25);
@@ -33,18 +32,17 @@ void free(void *ptr)
     }
     pthread_mutex_lock(&alloc_acces);
     size = GET_CHUNK_SIZE(ptr);
-    size = round_up_align(size, ALIGNMENT);
+    // size = round_up_align(size, ALIGNMENT);
+    ft_putnbr_fd(size, 1);
     SET_CHUNK_FREE(ptr);
     start_alloc = find_start(ptr);
-
     if (!start_alloc)
     {
         pthread_mutex_unlock(&alloc_acces);
         return ;
     }
     area_size = GET_ALLOC_SIZE(start_alloc);
-    write(1, "GOOD\n", 5);
-    if (GET_ALLOC_NUMBER(start_alloc) == 1 && *(void**)start_alloc != NULL) //We keep the first call to mmap
+    if (GET_ALLOC_NUMBER(start_alloc) == 1 && *(void**)start_alloc == NULL) //We keep the first call to mmap
         unlink_area(start_alloc, area_size);
     else // We can't free the area since more block are still in
     {

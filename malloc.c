@@ -33,7 +33,7 @@ static char* init_mmap(size_t size_to_map, size_t size_needed)
 static char* add_mmap_alloc(size_t size_to_map, size_t size_needed, char *curr_ptr)
 {
     char *ptr;
-    write(1, "MMAP CREATED\n", 14);
+
     ptr = new_mmap_alloc(size_to_map, size_needed);
     if (ptr == NULL)
         return NULL;

@@ -54,6 +54,8 @@ static char* search_in(char* to_find, char *ptr)
         if (ptr <= to_find && to_find <= end_ptr)
             return ptr - START_MMAP_ALLOC;
         ptr = next_ptr;
+        if (ptr == NULL)
+            break ;
         next_ptr = *(void**)(ptr);
         end_ptr = (ptr + GET_ALLOC_SIZE(ptr));
         ptr += START_MMAP_ALLOC;

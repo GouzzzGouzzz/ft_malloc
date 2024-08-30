@@ -10,8 +10,9 @@ void print(char *s)
 int     main()
 {
     char *str;
-    for (int i = 0; i < 114; i++){
+    for (int i = 0; i < 1; i++){
         str = malloc(256);
+        show_alloc_mem();
         free(str);
     }
 

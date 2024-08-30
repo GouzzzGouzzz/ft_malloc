@@ -43,7 +43,7 @@ fclean: clean
 	rm -f $(NAME) $(SYMLINK_NAME) main.o main
 
 test: re
-	$(CC) -c main.c -o main.o
+	$(CC)  -c main.c -o main.o
 	$(CC) main.o -o main $(LIBMALLOC) $(LIBFT) -Wl,-rpath,./
 
 re: fclean all
