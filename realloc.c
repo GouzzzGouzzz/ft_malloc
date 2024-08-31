@@ -27,13 +27,13 @@ static char *extend(size_t size, char* curr_alloc)
     if (new_ptr != NULL)
         return new_ptr;
     pthread_mutex_unlock(&alloc_acces);
-    new_ptr = malloc(size);
+    new_ptr = ft_malloc(size);
     if (!new_ptr)
         return NULL;
     pthread_mutex_lock(&alloc_acces);
     ft_memcpy(new_ptr, curr_alloc, GET_CHUNK_SIZE(curr_alloc));
     pthread_mutex_unlock(&alloc_acces);
-    free(curr_alloc);
+    ft_free(curr_alloc);
     return new_ptr;
 
 }
@@ -51,7 +51,7 @@ static void shrink(size_t size, size_t curr_size, void *ptr)
 void *realloc(void *ptr, size_t size)
 {
     if (!ptr)
-        return malloc(size);
+        return ft_malloc(size);
     if (!find_start(ptr))
     {
         write(1, "realloc(): invalid pointer\n", 28);
@@ -61,7 +61,7 @@ void *realloc(void *ptr, size_t size)
         return NULL;
     if (ptr && size == 0)
     {
-        free(ptr);
+        ft_free(ptr);
         return NULL;
     }
     pthread_mutex_lock(&alloc_acces);

@@ -1,19 +1,18 @@
 #include "ft_malloc.h"
-
 void init_malloc()
 {
     mem_pool.small = mmap(NULL, sysconf(_SC_PAGESIZE) * 4, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
     SET_CHUNK_FREE(mem_pool.small + START_MMAP_ALLOC);
     SET_ALLOC_SIZE(mem_pool.small, sysconf(_SC_PAGESIZE) * 4);
     SET_ALLOC_NUMBER(mem_pool.small, 1);
-    SET_PREV_ADRR(mem_pool.small, NULL);
-    SET_NEXT_ADDR(mem_pool.small, NULL);
+    SET_PREV_ADRR(mem_pool.small, 0);
+    SET_NEXT_ADDR(mem_pool.small, 0);
     mem_pool.medium = mmap(NULL, sysconf(_SC_PAGESIZE) * 8, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
     SET_CHUNK_FREE(mem_pool.medium + START_MMAP_ALLOC);
     SET_ALLOC_SIZE(mem_pool.medium, sysconf(_SC_PAGESIZE) * 8);
     SET_ALLOC_NUMBER(mem_pool.medium, 1);
-    SET_PREV_ADRR(mem_pool.medium, NULL);
-    SET_NEXT_ADDR(mem_pool.medium, NULL);
+    SET_PREV_ADRR(mem_pool.medium, 0);
+    SET_NEXT_ADDR(mem_pool.medium, 0);
 }
 
 int round_up_align(size_t size, int align_to)
@@ -90,7 +89,7 @@ void* find_chunk(char* start, char* end, size_t size_needed)
             if (chunk_size >= size_needed)
             {
                 SET_CHUNK_SIZE(start, size_needed);
-                if (start + round_up_align(size_needed, ALIGNMENT) + ALIGNMENT < end && round_up_align(GET_CHUNK_SIZE(start + size_needed + ALIGNMENT), ALIGNMENT) == 0)
+                if (start + round_up_align(size_needed, ALIGNMENT) + ALIGNMENT < end && GET_CHUNK_SIZE(start + size_needed + ALIGNMENT) == 0)
                     SET_CHUNK_FREE(start + round_up_align(size_needed, ALIGNMENT) + ALIGNMENT);
                 return start;
             }

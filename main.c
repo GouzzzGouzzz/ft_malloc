@@ -10,10 +10,10 @@ void print(char *s)
 int     main()
 {
     char *str;
-    for (int i = 0; i < 1; i++){
-        str = malloc(256);
-        show_alloc_mem();
-        free(str);
+    for (int i = 0; i < 1000; i++){
+        str = ft_malloc(256);
+        // show_alloc_mem();
+        ft_free(str);
     }
 
     show_alloc_mem();

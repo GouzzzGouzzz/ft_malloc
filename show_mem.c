@@ -51,42 +51,39 @@ static size_t calc_mmap_alloc(char *ptr)
     size_t total = 0;
     char *next_ptr;
     char *end_ptr;
+    int size = 0;
 
     if (!ptr)
         return 0;
-    next_ptr = *(void**)(ptr);
-    end_ptr = (ptr + GET_ALLOC_SIZE(ptr));
+    end_ptr = ptr + GET_ALLOC_SIZE(ptr);
+    next_ptr = *(void **)ptr;
     ptr += START_MMAP_ALLOC;
     while (1)
     {
-        while (ptr < end_ptr)
-        {
-            int size = GET_CHUNK_SIZE(ptr);
-            ft_putstr_fd("Size found :", 1);
-            ft_putnbr_fd(size, 1);
-            write(1,"\n",1);
-            if (size == -1)
-            {
-                while (ptr < end_ptr && *ptr == '\0'){
-                    ptr++;
-                }
+        size = GET_CHUNK_SIZE(ptr);
+        if (size == -1){
+            while (ptr < end_ptr && *ptr == '\0'){
+                ptr++;
             }
-            if (ptr == end_ptr)
-                break;
+            //Adjusting the memory since i don't use 8 bytes of "metadata" that was counted in the while above
+            if (ptr < end_ptr){
+                ptr += sizeof(size_t);
+            }
+        }
+        else{
             total += size;
             print_addr_diff(ptr, size);
-            ptr += ALIGNMENT + round_up_align(size, ALIGNMENT);
+            ptr += round_up_align(size, ALIGNMENT) + ALIGNMENT;
             print_bytes(" : ", size);
-            ft_putstr_fd("move :", 1);
-            ft_putnbr_fd(ALIGNMENT + round_up_align(size, ALIGNMENT), 1);
-            ft_putstr_fd("\n", 1);
         }
-        if (!next_ptr)
+        if (next_ptr == NULL) // End of linked list
             return total;
-        ptr = next_ptr;
-        next_ptr = *(void**)(ptr);
-        end_ptr = (ptr + GET_ALLOC_SIZE(ptr));
-        ptr += START_MMAP_ALLOC;
+        if (ptr >= end_ptr){ //Switching mmap area
+            ptr = next_ptr;
+            next_ptr = *(void **)ptr;
+            end_ptr = ptr + GET_ALLOC_SIZE(ptr);
+            ptr += START_MMAP_ALLOC;
+        }
     }
     return total;
 }
@@ -99,17 +96,17 @@ void show_alloc_mem()
     print_start_addr("SMALL  : ", mem_pool.small);
     small_total = calc_mmap_alloc(mem_pool.small);
     if (small_total == 0)
-        write(1, "None\n",6);
+        write(1, "None\n ",5);
 
     print_start_addr("MEDIUM  : ", mem_pool.medium);
     medium_total = calc_mmap_alloc(mem_pool.medium);
     if (medium_total == 0)
-        write(1, "None\n",6);
+        write(1, "None\n",5);
 
     print_start_addr("LARGE  : ", mem_pool.large);
     large_total = calc_mmap_alloc(mem_pool.large);
     if (large_total == 0)
-        write(1, "None\n",6);
+        write(1, "None\n",5);
 
     print_bytes("Total : ", small_total + medium_total + large_total);
     pthread_mutex_unlock(&alloc_acces);

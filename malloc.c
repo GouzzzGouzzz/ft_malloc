@@ -71,7 +71,7 @@ void* malloc_mmap(size_t size_needed, void *curr_ptr)
     }
 }
 
-void *malloc(size_t size)
+void *ft_malloc(size_t size)
 {
     char *ptr = NULL;
 
