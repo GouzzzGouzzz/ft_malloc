@@ -27,7 +27,7 @@ static char* init_mmap(size_t size_to_map, size_t size_needed)
         return NULL;
     SET_PREV_ADRR(ptr, NULL);
     SET_NEXT_ADDR(ptr, NULL);
-    return ptr + START_MMAP_ALLOC;
+    return ptr;
 }
 
 static char* add_mmap_alloc(size_t size_to_map, size_t size_needed, char *curr_ptr)
@@ -49,9 +49,12 @@ void* malloc_mmap(size_t size_needed, void *curr_ptr)
     char *end_ptr;
     int size_to_map;
 
-    size_to_map = round_up_align(size_needed + START_MMAP_ALLOC, 8 * sysconf(_SC_PAGESIZE));
+    size_to_map = round_up_align(size_needed + START_MMAP_ALLOC, sysconf(_SC_PAGESIZE));
     if (!curr_ptr) //first large case
-        return init_mmap(size_to_map, size_needed);
+    {
+        mem_pool.large = init_mmap(size_to_map, size_needed);
+        return mem_pool.large + START_MMAP_ALLOC;
+    }
     else
     {
         while (curr_ptr != NULL)
@@ -71,7 +74,7 @@ void* malloc_mmap(size_t size_needed, void *curr_ptr)
     }
 }
 
-void *ft_malloc(size_t size)
+void *malloc(size_t size)
 {
     char *ptr = NULL;
 

@@ -38,6 +38,34 @@ int calc_free_area(char *start, char *end)
     return start_ptr - start;
 }
 
+static int check_valid(char *received, char *ptr){
+    char *end_ptr;
+    int size;
+
+    ptr -= START_MMAP_ALLOC;
+    end_ptr = ptr + GET_ALLOC_SIZE(ptr);
+    ptr += START_MMAP_ALLOC;
+    while (ptr < end_ptr)
+    {
+        size = GET_CHUNK_SIZE(ptr);
+        if (size == -1){
+            while (ptr < end_ptr && *ptr == '\0'){
+                ptr++;
+            }
+            if (ptr < end_ptr){
+                ptr += sizeof(size_t);
+            }
+        }
+        else{
+            if (received == ptr){
+                return 1;
+            }
+            ptr += round_up_align(size, ALIGNMENT) + ALIGNMENT;
+        }
+    }
+    return -1;
+}
+
 static char* search_in(char* to_find, char *ptr)
 {
     char *next_ptr;
@@ -50,8 +78,13 @@ static char* search_in(char* to_find, char *ptr)
     ptr += START_MMAP_ALLOC;
     while (ptr != NULL)
     {
-        if (ptr <= to_find && to_find <= end_ptr)
-            return ptr - START_MMAP_ALLOC;
+        if (ptr <= to_find && to_find <= end_ptr){
+            if (check_valid(to_find, ptr) == 1)
+                return ptr - START_MMAP_ALLOC;
+            else{
+                return NULL;
+            }
+        }
         ptr = next_ptr;
         if (ptr == NULL)
             break ;
