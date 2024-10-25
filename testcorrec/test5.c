@@ -1,6 +1,6 @@
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include "ft_malloc.h"
 
 void print(char *s)
 {
@@ -21,10 +21,12 @@ int     main()
         if (addr == NULL)
         {
             print("Failed to allocate memory\n");
+            exit(1);
         }
         if ((((unsigned long) (addr)) % alignment) != 0)
         {
             print("malloc returned a non aligned boundary\n");
+            exit(1);
         }
         i++;
         free(addr);
