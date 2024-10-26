@@ -39,7 +39,7 @@ void free(void *ptr)
 
     if (!find_start(ptr))
     {
-        write(1, "free(): invalid pointer\n", 25);
+        write(1, "free(): invalid pointer\n", 24);
         return ;
     }
     pthread_mutex_lock(&alloc_acces);
