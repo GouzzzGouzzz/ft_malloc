@@ -76,7 +76,7 @@ static size_t calc_mmap_alloc(char *ptr)
             ptr += round_up_align(size, ALIGNMENT) + ALIGNMENT;
             print_bytes(" : ", size);
         }
-        if (next_ptr == NULL) // End of linked list
+        if (next_ptr == NULL && ptr >= end_ptr) // End of linked list
             return total;
         if (ptr >= end_ptr){ //Switching mmap area
             ptr = next_ptr;
@@ -111,3 +111,4 @@ void show_alloc_mem()
     print_bytes("Total : ", small_total + medium_total + large_total);
     pthread_mutex_unlock(&alloc_acces);
 }
+
